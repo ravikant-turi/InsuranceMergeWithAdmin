@@ -1,3 +1,10 @@
+<!--
+  Copyright © 2025 Infinite Computer Solution. All rights reserved.
+ 
+  Author: Ravikant Turi
+ 
+  Description: This is insurance details page
+-->
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f"%>
 <%@ taglib uri="http://java.sun.com/jsf/html" prefix="h"%>
@@ -407,10 +414,10 @@ h\:outputText {
 
 			<div class="button-row">
 
-				<h:commandButton value="Cancel"
+				<h:commandButton value="Back"
 					action="AInsuranceAdminDashBoard.jsp"
 					styleClass="action-btn right-btn" />
-				<h:commandButton value="Back" action="AInsuranceAdminDashBoard.jsp"
+				<h:commandButton value="Cancel" action="AInsuranceAdminDashBoard.jsp"
 					styleClass="action-btn" />
 			</div>
 		</div>

@@ -18,7 +18,7 @@ public class CreateInsuranceMessageConstants {
 	public final String MIN_MEMBER_NEGATIVE = "Minimum member cannot be negative.";
 	public final String MIN_MEMBER_ZERO = "Minimum member cannot be zero.";
 	// Individual member
-	public final String INDIVIDUAL_MEMBER_ALLOWED = "Only one member is allowed";
+	public final String INDIVIDUAL_MEMBER_ALLOWED = "Only one member is allowed individual";
 	public final String PLAN_NAME_REQUIRED = "Plan name is required.";
 	public final String PLAN_NAME_TOO_SHORT = "Plan name must be at least 4 characters.";
 	public final String PLAN_NAME_INVALID = "Plan name must contain only alphabetic characters (no digits or special characters).";

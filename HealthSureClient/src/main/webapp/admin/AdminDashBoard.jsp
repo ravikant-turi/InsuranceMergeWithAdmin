@@ -47,46 +47,10 @@
 						styleClass="w-full py-3 px-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium shadow transition" />
 				</h:form>
 
-				<h:form>
-					<h:commandButton value="✅ Provider Review" action="null"
-						styleClass="w-full py-3 px-5 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium shadow transition" />
-				</h:form>
-
-				<h:form>
-					<h:commandButton value="🔍 Provider Inquiry" action="null"
-						styleClass="w-full py-3 px-5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium shadow transition" />
-				</h:form>
-
 
 
 				<h:form>
-					<h:commandButton value="👥 Member Inquiry" action="null"
-						styleClass="w-full py-3 px-5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-medium shadow transition" />
-				</h:form>
-
-				<h:form>
-					<h:commandButton value="✏️ Update Provider" action="null"
-						styleClass="w-full py-3 px-5 bg-yellow-600 hover:bg-yellow-700 text-white rounded-xl font-medium shadow transition" />
-				</h:form>
-
-				<h:form>
-					<h:commandButton value="✏️ Update Member" action="null"
-						styleClass="w-full py-3 px-5 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-medium shadow transition" />
-				</h:form>
-
-
-				<h:form>
-					<h:commandButton value="🔎 Search Claims" action="null"
-						styleClass="w-full py-3 px-5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl font-medium shadow transition" />
-				</h:form>
-
-				<h:form>
-					<h:commandButton value="⚖️ Process Claims" action="null"
-						styleClass="w-full py-3 px-5 bg-lime-600 hover:bg-lime-700 text-white rounded-xl font-medium shadow transition" />
-				</h:form>
-
-				<h:form>
-					<h:commandButton value="💰 Pay Hospitals" action="null"
+					<h:commandButton value="Others" action="null"
 						styleClass="w-full py-3 px-5 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded-xl font-medium shadow transition" />
 				</h:form>
 

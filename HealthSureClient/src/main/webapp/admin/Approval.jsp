@@ -195,7 +195,8 @@ th a, th a:visited {
 <body>
 
 	<!-- Include Fixed Navbar -->
-	<jsp:include page="/navbar/NavPharmacy.jsp" />
+	<!-- 🌐 Navigation -->
+	<jsp:include page="./../navbar/NavAdmin.jsp" />
 
 	<!-- Spacing below navbar -->
 	<div style="margin-top: 100px;"></div>

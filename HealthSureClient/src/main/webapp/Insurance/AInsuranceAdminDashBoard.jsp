@@ -112,15 +112,16 @@ table, th, td {
 	border: none;
 	cursor: pointer;
 }
-.pagination{
-    background-color: gray;
+
+.pagination {
+	background-color: gray;
 	color: white;
 	border: none;
 	padding: 8px 12px;
 	border-radius: 4px;
 	cursor: pointer;
 	font-size: 14px;
-	font-weight:12px;
+	font-weight: 12px;
 	width: 90px; /* Fixed width for uniform size */
 	text-align: center;
 	height: 35px;
@@ -128,13 +129,17 @@ table, th, td {
 </style>
 </head>
 <body>
+	<!-- 🌐 Navigation -->
+	<jsp:include page="./../navbar/NavAdmin.jsp" />
+	<!-- Spacing below navbar -->
+	<div style="margin-top: 130px;"></div>
 
 	<!-- ✅ Header with Add Button -->
 	<div class="header-bar">
 		<h1>Insurance Plan List</h1>
 		<h:form>
 			<h:commandButton value="Add"
-				action="AInsuranceAddInsuranceCoveragePlan.jsp"
+				action="#{createInsuranceController.navigateToAddInsurance}"
 				styleClass="action-btn" style="background-color:gray" />
 		</h:form>
 	</div>

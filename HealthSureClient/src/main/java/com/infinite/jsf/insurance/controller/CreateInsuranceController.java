@@ -185,6 +185,11 @@ public class CreateInsuranceController {
 		return planList;
 	}
 
+	public String navigateToAddInsurance() {
+		resetAll();
+		return "AInsuranceAddInsuranceCoveragePlan";
+	}
+
 	/**
 	 * Adds a new insurance plan along with predefined coverage options: Silver,
 	 * Gold, and Platinum. This method is responsible for creating the base
@@ -204,9 +209,10 @@ public class CreateInsuranceController {
 		coverageOption2.setInsurancePlan(insurancePlan);
 		coverageOption3.setInsurancePlan(insurancePlan);
 		if (isSilver && validateInsurancePlanWithFacesMessage(insurancePlan)
-				|| validateInsuranceCoverageOptionWithFacesMessage1(coverageOption1)
-				|| validateInsuranceMeberRelationsWithFacesMessage(insurancePlan)
-				|| (isGold && validateInsuranceCoverageOptionWithFacesMessage2(coverageOption2)
+				|| (validateInsuranceCoverageOptionWithFacesMessage1(coverageOption1))
+				|| ((insurancePlan.getPlanType() != null
+						&& validateInsuranceMeberRelationsWithFacesMessage(insurancePlan))
+						|| (isGold && validateInsuranceCoverageOptionWithFacesMessage2(coverageOption2))
 						|| (isPlatinum && validateInsuranceCoverageOptionWithFacesMessage3(coverageOption3)))) {
 
 			// silver(coverage1) is mandatory
@@ -273,6 +279,7 @@ public class CreateInsuranceController {
 	 *         operation.
 	 */
 	public String findAllPlanDetailsByPlanId(String planId) {
+		resetAll();
 
 		insurancePlan = insurancplanDao.findInsuranceById(planId);
 
@@ -321,7 +328,7 @@ public class CreateInsuranceController {
 	 *         update operation.
 	 */
 	public String updateInsurancePlan(String planId) {
-
+		resetAll();
 		insurancePlan = insurancplanDao.findInsuranceById(planId);
 		members = memberPlanRuleDao.searchMemberByPlanId(planId);
 		planwithCovrageDetailsList = insuranceCoverageOptionDao.findAllInsuranceCoverageOptionsByPlanId(planId);
@@ -859,7 +866,7 @@ public class CreateInsuranceController {
 			isValid = false;
 		} else if (yearsToAdd == 0) {
 			context.addMessage("companyForm:yearsToAdd",
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "required", null));
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "durantion is required", null));
 			logger.info("Duration is zero.");
 			isValid = false;
 		}
@@ -869,44 +876,43 @@ public class CreateInsuranceController {
 
 	// VALIDATION :: INSURANCECOVERAGE : SILVER , GOLD , PLATINUM
 
-	public boolean validateInsuranceCoverageOptionWithFacesMessage1(InsuranceCoverageOption option) {
+	public boolean validateInsuranceCoverageOptionWithFacesMessage1(InsuranceCoverageOption silverOption) {
 		FacesContext context = FacesContext.getCurrentInstance();
 		boolean isValid = true;
 
 		// Validate plan
-		if (option.getInsurancePlan() == null) {
+		if (silverOption.getInsurancePlan() == null) {
 			context.addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.LINKED_PLAN_REQUIRED, null));
 			isValid = false;
 		}
 
 		// Validate premiumAmount
-		if (option.getPremiumAmount() < 500 || option.getPremiumAmount() > 100000) {
+		if (silverOption.getPremiumAmount() < 500 || silverOption.getPremiumAmount() > 100000) {
 			context.addMessage("companyForm:PremiumAmount",
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.PREMIUM_AMOUNT_RANGE, null));
 			isValid = false;
 		}
 
 		// Validate coverageAmount
-		if (option.getCoverageAmount() < 100000 || option.getCoverageAmount() > 50000000) {
+		if (silverOption.getCoverageAmount() < 100000 || silverOption.getCoverageAmount() > 50000000) {
 			context.addMessage("companyForm:CoverageAmount",
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.COVERAGE_AMOUNT_RANGE, null));
 			isValid = false;
 		}
 
 		// Premium should not exceed coverage
-		if (option.getPremiumAmount() > option.getCoverageAmount()) {
+		if (silverOption.getPremiumAmount() > silverOption.getCoverageAmount()) {
 			context.addMessage("companyForm:CoverageAmount", new FacesMessage(FacesMessage.SEVERITY_ERROR,
 					validationMessages.COVERAGE_GREATER_THAN_PREMIUM, null));
 			isValid = false;
 		}
-		if (option != null && option.getInsurancePlan() != null && option.getCoverageType() != null
-				&& option.getInsurancePlan().getAvailableCoverAmounts() != null) {
+		if (silverOption != null && silverOption.getInsurancePlan() != null && silverOption.getCoverageType() != null
+				&& silverOption.getInsurancePlan().getAvailableCoverAmounts() != null) {
 
-			if (coverageOption1.getInsurancePlan().getPlanType() != null
-					&& option.getCoverageType().equals(CoverageType.SILVER)) {
+			if (silverOption.getCoverageType().equals(CoverageType.SILVER)) {
 
-				if (option.getCoverageAmount() != option.getInsurancePlan().getAvailableCoverAmounts()) {
+				if (silverOption.getCoverageAmount() != silverOption.getInsurancePlan().getAvailableCoverAmounts()) {
 					context.addMessage("companyForm:CoverageAmount", new FacesMessage(FacesMessage.SEVERITY_ERROR,
 							validationMessages.COVERAGE_AMOUNT_MISMATCH, null));
 
@@ -919,32 +925,32 @@ public class CreateInsuranceController {
 		return isValid;
 	}
 
-	public boolean validateInsuranceCoverageOptionWithFacesMessage2(InsuranceCoverageOption option) {
+	public boolean validateInsuranceCoverageOptionWithFacesMessage2(InsuranceCoverageOption goldOption) {
 		FacesContext context = FacesContext.getCurrentInstance();
 		boolean isValid = true;
 
 		// Validate plan
-		if (option.getInsurancePlan() == null || option.getInsurancePlan() == null) {
+		if (goldOption.getInsurancePlan() == null || goldOption.getInsurancePlan() == null) {
 			context.addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.LINKED_PLAN_REQUIRED, null));
 			isValid = false;
 		}
 
 		// Validate premiumAmount
-		if (option.getPremiumAmount() < 500 || option.getPremiumAmount() > 100000) {
+		if (goldOption.getPremiumAmount() < 500 || goldOption.getPremiumAmount() > 100000) {
 			context.addMessage("companyForm:PremiumAmount2",
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.PREMIUM_AMOUNT_RANGE, null));
 			isValid = false;
 		}
 
 		// Validate coverageAmount
-		if (option.getCoverageAmount() < 100000 || option.getCoverageAmount() > 50000000) {
+		if (goldOption.getCoverageAmount() < 100000 || goldOption.getCoverageAmount() > 50000000) {
 			context.addMessage("companyForm:CoverageAmount2",
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.COVERAGE_AMOUNT_RANGE, null));
 			isValid = false;
 		}
-		// option.premiumAmount > option.coverageAmount
-		if (option.getPremiumAmount() > option.getCoverageAmount()) {
+		// goldOption.premiumAmount > goldOption.coverageAmount
+		if (goldOption.getPremiumAmount() > goldOption.getCoverageAmount()) {
 			context.addMessage("companyForm:CoverageAmount2", new FacesMessage(FacesMessage.SEVERITY_ERROR,
 					validationMessages.COVERAGE_GREATER_THAN_PREMIUM, null));
 			isValid = false;
@@ -953,32 +959,32 @@ public class CreateInsuranceController {
 		return isValid;
 	}
 
-	public boolean validateInsuranceCoverageOptionWithFacesMessage3(InsuranceCoverageOption option) {
+	public boolean validateInsuranceCoverageOptionWithFacesMessage3(InsuranceCoverageOption platinumOption) {
 		FacesContext context = FacesContext.getCurrentInstance();
 		boolean isValid = true;
 
 		// Validate plan
-		if (option.getInsurancePlan() == null || option.getInsurancePlan() == null) {
+		if (platinumOption.getInsurancePlan() == null || platinumOption.getInsurancePlan() == null) {
 			context.addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.LINKED_PLAN_REQUIRED, null));
 			isValid = false;
 		}
 
 		// Validate premiumAmount
-		if (option.getPremiumAmount() < 500 || option.getPremiumAmount() > 100000) {
+		if (platinumOption.getPremiumAmount() < 500 || platinumOption.getPremiumAmount() > 100000) {
 			context.addMessage("companyForm:PremiumAmount3",
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.PREMIUM_AMOUNT_RANGE, null));
 			isValid = false;
 		}
 
 		// Validate coverageAmount
-		if (option.getCoverageAmount() < 100000 || option.getCoverageAmount() > 50000000) {
+		if (platinumOption.getCoverageAmount() < 100000 || platinumOption.getCoverageAmount() > 50000000) {
 			context.addMessage("companyForm:CoverageAmount3",
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.COVERAGE_AMOUNT_RANGE, null));
 			isValid = false;
 		}
-		// option.premiumAmount > option.coverageAmount
-		if (option.getPremiumAmount() > option.getCoverageAmount()) {
+		// platinumOption.premiumAmount > platinumOption.coverageAmount
+		if (platinumOption.getPremiumAmount() > platinumOption.getCoverageAmount()) {
 			context.addMessage("companyForm:CoverageAmount3", new FacesMessage(FacesMessage.SEVERITY_ERROR,
 					validationMessages.COVERAGE_GREATER_THAN_PREMIUM, null));
 			isValid = false;
@@ -991,7 +997,13 @@ public class CreateInsuranceController {
 		FacesContext context = FacesContext.getCurrentInstance();
 		boolean isValid = true;
 		logger.info("we inside the member validation");
-		logger.info("insurancePlanType : " + insurancePlan.getPlanType());
+		if (insurancePlan == null) {
+
+			context.addMessage("companyForm:memberValidation",
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Insuranceplan is empty", null));
+			return false;
+
+		}
 
 		// Ensure SON1 is true if SON2 is true and SON1 is false
 		if (Boolean.TRUE.equals(relationMap.get("SON2")) && !Boolean.TRUE.equals(relationMap.get("SON1"))) {
@@ -1009,7 +1021,8 @@ public class CreateInsuranceController {
 				.collect(Collectors.toList());
 		System.out.println(selectedRelations);
 
-		if (insurancePlan.getPlanType() == PlanType.valueOf("FAMILY")) {
+		if (insurancePlan.getPlanType() != null && insurancePlan.getPlanType() == PlanType.valueOf("FAMILY")) {
+			logger.info("insurancePlanType : " + insurancePlan.getPlanType());
 			if (selectedRelations.size() != insurancePlan.getMaximumMemberAllowed()) {
 				context.addMessage("companyForm:memberValidation", new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"Must choise maximum member that you mention", null));
@@ -1030,7 +1043,7 @@ public class CreateInsuranceController {
 			}
 		}
 
-		if (insurancePlan.getPlanType() == PlanType.valueOf("INDIVIDUAL")) {
+		if (insurancePlan.getPlanType().equals(PlanType.INDIVIDUAL)) {
 			logger.info("we are inside individual Type");
 			logger.info("and gender is: " + individualMemberGender);
 			relationMap.put("SON1", false);
@@ -1069,6 +1082,66 @@ public class CreateInsuranceController {
 			}
 		}
 		return isValid;
+	}
+
+	public boolean validatePremiumAndCoverrageAmountOfAllCoverageOptions(InsuranceCoverageOption silverOption,
+			InsuranceCoverageOption goldOption, InsuranceCoverageOption platinumOption) {
+		boolean isValid = true;
+		FacesContext context = FacesContext.getCurrentInstance();
+		if (isSilver && silverOption != null && isGold && goldOption != null) {
+
+			if (silverOption.getPremiumAmount() > goldOption.getPremiumAmount()) {
+				context.addMessage("companyForm:PremiumAmount2", new FacesMessage(FacesMessage.SEVERITY_ERROR,
+						"GoldOption PremiumAmount  must be greater than SilverOption premiumAmount", null));
+				isValid = false;
+			}
+			if (silverOption.getCoverageAmount() > goldOption.getCoverageAmount()) {
+				context.addMessage("companyForm:CoverageAmount2", new FacesMessage(FacesMessage.SEVERITY_ERROR,
+						"GoldOption CoverageAmount  must be greater than SilverOption CoverageAmount", null));
+				isValid = false;
+			}
+
+		}
+		if (isGold && goldOption != null && isPlatinum && platinumOption != null) {
+
+			if (goldOption.getPremiumAmount() > platinumOption.getPremiumAmount()) {
+				context.addMessage("companyForm:PremiumAmount3", new FacesMessage(FacesMessage.SEVERITY_ERROR,
+						"platinumOption PremiumAmount  must be greater than goldOption premiumAmount", null));
+				isValid = false;
+			}
+			if (goldOption.getCoverageAmount() > platinumOption.getCoverageAmount()) {
+				context.addMessage(
+						"companyForm:CoverageAmount3", new FacesMessage(FacesMessage.SEVERITY_ERROR,
+						"platinumOption CoverageAmount  must be greater than goldOption CoverageAmount", null));
+				isValid = false;
+			}
+
+		}
+
+		if (!isGold && isSilver && silverOption != null && isPlatinum && platinumOption != null) {
+
+			if (silverOption.getPremiumAmount() > platinumOption.getPremiumAmount()) {
+				context.addMessage("companyForm:PremiumAmount3", new FacesMessage(FacesMessage.SEVERITY_ERROR,
+						"platinumOption PremiumAmount  must be greater than SilverOption premiumAmount", null));
+				isValid = false;
+			}
+			if (silverOption.getCoverageAmount() > platinumOption.getCoverageAmount()) {
+				context.addMessage("companyForm:CoverageAmount3", new FacesMessage(FacesMessage.SEVERITY_ERROR,
+						"platinumOption CoverageAmount  must be greater than SilverOption CoverageAmount", null));
+				isValid = false;
+			}
+
+		}
+		return isValid;
+
+	}
+
+	public void resetAll() {
+		insurancePlan = new InsurancePlan();
+		coverageOption1 = new InsuranceCoverageOption();
+		coverageOption2 = new InsuranceCoverageOption();
+		coverageOption3 = new InsuranceCoverageOption();
+		insurancePlan.setInsuranceCompany(insuranceCompany);
 	}
 
 }
