@@ -1,14 +1,22 @@
+/** 
+ * Copyright © 2025 Infinite Computer Solution. All rights reserved.
+ */
+/**
+ * Package: com.infinite.jsf.insurance.model
+ * 
+ * This package contains model classes for the insurance module of the Infinite JSF application.
+ * These classes represent the core business entities and are used for data transfer between
+ * different layers of the application.
+ */
 package com.infinite.jsf.insurance.model;
 
 /**
  * InsuranceCoverageOption.java
  * 
- * This class represents a coverage option associated with an insurance plan.
- * It includes details such as premium amount, coverage amount, and status.
+ * This class represents a coverage option associated with an insurance plan. It
+ * includes details such as premium amount, coverage amount, and status.
  * 
- * Copyright © 2025 Infinite Computer Solution. All rights reserved.
  */
-
 
 public class InsuranceCoverageOption {
 
@@ -21,7 +29,6 @@ public class InsuranceCoverageOption {
 	private double coverageAmount;
 
 	private CoveragePlanStatus status;
-
 
 	private CoverageType coverageType;
 
@@ -57,8 +64,6 @@ public class InsuranceCoverageOption {
 		this.coverageAmount = coverageAmount;
 	}
 
-		
-
 	@Override
 	public String toString() {
 		return "InsuranceCoverageOption [coverageId=" + coverageId + ", insurancePlan=" + insurancePlan
@@ -81,7 +86,6 @@ public class InsuranceCoverageOption {
 	public void setCoverageType(CoverageType coverageType) {
 		this.coverageType = coverageType;
 	}
-	
 
 	public InsuranceCoverageOption() {
 		super();

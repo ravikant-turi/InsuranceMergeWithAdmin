@@ -1,3 +1,13 @@
+/** 
+ * Copyright © 2025 Infinite Computer Solution. All rights reserved.
+ */
+/**
+ * Package: com.infinite.jsf.insurance.model
+ * 
+ * This package contains model classes for the insurance module of the Infinite JSF application.
+ * These classes represent the core business entities and are used for data transfer between
+ * different layers of the application.
+ */
 package com.infinite.jsf.insurance.model;
 
 /**
@@ -7,7 +17,6 @@ package com.infinite.jsf.insurance.model;
  * insurance plan. It includes property of MemberPlanRule such as name, age,
  * gender, and relation to the policyholder.
  * 
- * Copyright © 2025 Infinite Computer Solution. All rights reserved.
  */
 
 public class MemberPlanRule {

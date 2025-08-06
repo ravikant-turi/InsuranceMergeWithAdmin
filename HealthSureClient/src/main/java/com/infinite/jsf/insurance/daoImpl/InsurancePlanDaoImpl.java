@@ -1,31 +1,33 @@
+
 /**
- * InsurancePlanDaoImpl.java
- *
- * This class provides the implementation of the InsurancePlanDao interface.
- * It handles CRUD operations for InsurancePlan entities using Hibernate ORM.
- * Operations include adding, updating, retrieving by ID, and listing all plans.
- *
- * Copyright © 2025 Infinite Computer Solution. All rights reserved.
+ *  Copyright © 2025 Infinite Computer Solution. All rights reserved.
+ */
+
+/**
+ * This package contains the implementation classes for DAO (Data Access Object)
+ * related to the insurance module 
  */
 
 package com.infinite.jsf.insurance.daoImpl;
-
-import java.util.Date;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+import java.util.Date;
+import java.util.List;
+
 import com.infinite.jsf.insurance.dao.InsurancePlanDao;
 import com.infinite.jsf.insurance.model.InsurancePlan;
-import com.infinite.jsf.insurance.model.CreateInsuranceMessageConstants;
 import com.infinite.jsf.util.SessionHelper;
 
 /**
- * Implementation of InsurancePlanDao interface. Provides methods to perform
- * database operations on InsurancePlan entities.
+ *
+ * This class provides the implementation of the InsurancePlanDao interface. It
+ * handles CRUD operations for InsurancePlan entities using Hibernate ORM.
+ * Operations include adding, updating, retrieving by ID, and listing all plans.
+ *
  */
 public class InsurancePlanDaoImpl implements InsurancePlanDao {
 

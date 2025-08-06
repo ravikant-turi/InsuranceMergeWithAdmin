@@ -1,13 +1,13 @@
-package com.infinite.jsf.admin.daoImpl;
-
 /**
  * Copyright © 2025 Infinite Computer Solution. All rights reserved.
- *
- * Implementation of ReviewPharmacyaDao interface for pharmacy review
- * operations. This class handles fetching pharmacy details, searching by ID,
- * and updating pharmacy status. Hibernate is used for ORM and Log4j for
- * logging.
  */
+
+/**
+ * This package contains DAO implementation classes for performing database operations
+ * related to administrative features such as pharmacy review and approval.
+ */
+package com.infinite.jsf.admin.daoImpl;
+
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -21,6 +21,12 @@ import com.infinite.jsf.pharmacy.model.Pharmacy;
 import com.infinite.jsf.util.MailSend;
 import com.infinite.jsf.util.SessionHelper;
 
+/**
+ * Implementation of ReviewPharmacyaDao interface for pharmacy review
+ * operations. This class handles fetching pharmacy details, searching by ID,
+ * and updating pharmacy status. Hibernate is used for ORM and Log4j for
+ * logging.
+ */
 public class ReviewPharmacyaDaoImpl implements ReviewPharmacyaDao {
 
 	static SessionFactory factory;

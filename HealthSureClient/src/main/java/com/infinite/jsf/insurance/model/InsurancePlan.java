@@ -1,3 +1,13 @@
+/** 
+ * Copyright © 2025 Infinite Computer Solution. All rights reserved.
+ */
+/**
+ * Package: com.infinite.jsf.insurance.model
+ * 
+ * This package contains model classes for the insurance module of the Infinite JSF application.
+ * These classes represent the core business entities and are used for data transfer between
+ * different layers of the application.
+ */
 package com.infinite.jsf.insurance.model;
 
 import java.io.Serializable;
@@ -5,15 +15,12 @@ import java.util.Date;
 import java.util.Set;
 
 /**
- * InsurancePlan.java
- * 
  * This class represents an insurance plan offered by an insurance company. It
  * includes details such as plan type, age limits, coverage, and associated
  * members.
- * 
- * Copyright © 2025 Infinite Computer Solution. All rights reserved.
  */
 public class InsurancePlan implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private String planId;
 	private InsuranceCompany insuranceCompany;
 

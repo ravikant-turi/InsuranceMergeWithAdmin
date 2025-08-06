@@ -1,16 +1,11 @@
 /**
  * Copyright © 2025 Infinite Computer Solution. All rights reserved.
- * CreateInsuranceController.java
- *
- * 
- *
- * Typical responsibilities include:
- * - Initializing form data
- * - Handling user input and triggering business logic
- * - Managing navigation outcomes
- * - Coordinating with DAO classes to persist insurance-related data
- *
- *
+ */
+
+/**
+ * This package contains controller classes that manage user interactions for insurance-related features,
+ * including plan creation, coverage options, validations, and data persistence.
+ * These controllers act as a bridge between the JSF view layer and backend services and DAOs.
  */
 
 package com.infinite.jsf.insurance.controller;
@@ -25,13 +20,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-
 import org.apache.log4j.Logger;
-
 import com.infinite.jsf.insurance.dao.InsuranceCompanyDao;
 import com.infinite.jsf.insurance.dao.InsuranceCoverageOptionDao;
 import com.infinite.jsf.insurance.dao.InsurancePlanDao;
@@ -51,11 +43,17 @@ import com.infinite.jsf.insurance.model.CreateInsuranceMessageConstants;
 import com.infinite.jsf.insurance.model.PlanType;
 import com.infinite.jsf.insurance.model.Relation;
 
-/*This controller class is responsible for handling user interactions related to
-* the creation of insurance entities such as plans, coverage options, and associated rules.
-* It acts as a bridge between the JSF view layer and the backend services or DAOs,
-* managing form submissions, validations, and data persistence.
-* */
+/**
+ * This controller class is responsible for handling user interactions related
+ * to the creation of insurance entities such as plans, coverage options, and
+ * associated rules. It acts as a bridge between the JSF view layer and the
+ * backend services managing form submissions, validations, and data
+ * persistence.
+ *
+ * Typical responsibilities include: - Initializing form data - Handling user
+ * input and triggering business logic - Managing navigation outcomes -
+ * Coordinating with DAO classes to persist insurance-related data
+ */
 public class CreateInsuranceController {
 	private InsuranceCompany insuranceCompany;
 	private InsurancePlan insurancePlan;
@@ -89,9 +87,7 @@ public class CreateInsuranceController {
 	private boolean sortAscending = true;
 
 	public List<InsurancePlan> getPaginatedPlans() {
-		if (planList == null) {
-			planList = showAllPlan(); // Load once
-		}
+		planList = showAllPlan(); // Load once
 		int start = currentPage * pageSize;
 		int end = Math.min(start + pageSize, planList.size());
 		return planList.subList(start, end);
@@ -182,6 +178,7 @@ public class CreateInsuranceController {
 
 	public List<InsurancePlan> showAllPlan() {
 		planList = insurancplanDao.showAllPlan();
+		System.out.println(planList);
 		return planList;
 	}
 
@@ -198,7 +195,12 @@ public class CreateInsuranceController {
 	 *
 	 * @return Navigation outcome or status string indicating success or failure.
 	 */
-	public String addSilverOnlyMendatory() {
+	public String addSilverOnlyMendatorytemp() {
+
+		System.out.println(insurancePlan + " null : " + insurancePlan == null);
+		System.out.println(coverageOption1 + " null : " + coverageOption1 == null);
+		System.out.println(coverageOption2 + " null : " + coverageOption2 == null);
+		System.out.println(coverageOption3 + " null : " + coverageOption3 == null);
 
 		insurancePlan.setInsuranceCompany(insuranceCompany);
 		if (insurancePlan.getActiveOn() != null) {
@@ -208,12 +210,16 @@ public class CreateInsuranceController {
 		coverageOption1.setInsurancePlan(insurancePlan);
 		coverageOption2.setInsurancePlan(insurancePlan);
 		coverageOption3.setInsurancePlan(insurancePlan);
+
 		if (isSilver && validateInsurancePlanWithFacesMessage(insurancePlan)
 				|| (validateInsuranceCoverageOptionWithFacesMessage1(coverageOption1))
 				|| ((insurancePlan.getPlanType() != null
 						&& validateInsuranceMeberRelationsWithFacesMessage(insurancePlan))
 						|| (isGold && validateInsuranceCoverageOptionWithFacesMessage2(coverageOption2))
-						|| (isPlatinum && validateInsuranceCoverageOptionWithFacesMessage3(coverageOption3)))) {
+						|| (isPlatinum && validateInsuranceCoverageOptionWithFacesMessage3(coverageOption3)))
+
+				|| validatePremiumAndCoverrageAmountOfAllCoverageOptions(coverageOption1, coverageOption2,
+						coverageOption3)) {
 
 			// silver(coverage1) is mandatory
 			if (isSilver && validateInsurancePlanWithFacesMessage(insurancePlan)
@@ -267,6 +273,85 @@ public class CreateInsuranceController {
 
 		return null;
 
+	}
+
+	public String addSilverOnlyMendatory() {
+
+		// Prepare insurance plan
+		// add company (insurance must belong to any company
+		insurancePlan.setInsuranceCompany(insuranceCompany);
+
+		// insurance expire date calculated dynamically using activeOnDate and duration
+		if (insurancePlan.getActiveOn() != null) {
+			insurancePlan.setExpireDate(calculateExpiryDate(insurancePlan.getActiveOn(), yearsToAdd));
+		}
+
+		// insuranceplan created date will be today
+		insurancePlan.setCreatedOn(new Date());
+
+		// Link coverage options to the plan
+		coverageOption1.setInsurancePlan(insurancePlan);
+		coverageOption2.setInsurancePlan(insurancePlan);
+		coverageOption3.setInsurancePlan(insurancePlan);
+
+		// Step 1: Validate Silver (mandatory)
+		boolean silverValid = isSilver && validateInsurancePlanWithFacesMessage(insurancePlan)
+				&& validateInsuranceMeberRelationsWithFacesMessage(insurancePlan)
+				&& validateInsuranceCoverageOptionWithFacesMessage1(coverageOption1);
+
+		if (!silverValid) {
+			return null; // Silver is mandatory
+		}
+
+		// Step 2: If Gold or Platinum is selected, validate them
+		if (isGold && !validateInsuranceCoverageOptionWithFacesMessage2(coverageOption2)
+				&& !validatePremiumAndCoverrageAmountOfAllCoverageOptions(coverageOption1, coverageOption2,
+						coverageOption3)) {
+
+			System.out.println("ham yhi fail ho gye hai gold me");
+			return null; // Gold selected but invalid
+		}
+
+		if (isPlatinum && !validateInsuranceCoverageOptionWithFacesMessage3(coverageOption3)
+				&& !validatePremiumAndCoverrageAmountOfAllCoverageOptions(coverageOption1, coverageOption2,
+						coverageOption3)) {
+			System.out.println("ham yhi fail ho gye hai platinium me");
+
+			return null; // Platinum selected but invalid
+		}
+
+		// Step 3: Save insurance plan and Silver coverage
+		insurancplanDao.addInsurancePlan(insurancePlan);
+		insuranceCoverageOptionDao.addCoveragePlan(coverageOption1);
+
+		// Step 4: Add members
+		if (insurancePlan.getPlanType() == PlanType.INDIVIDUAL) {
+			MemberPlanRule member = new MemberPlanRule();
+			member.setInsurancePlan(insurancePlan);
+			member.setRelation(Relation.INDIVIDUAL);
+			member.setGender(Gender.valueOf(individualMemberGender));
+			memberPlanRuleDao.addMember(member);
+		} else {
+			for (String relation : selectedRelations) {
+				MemberPlanRule member = new MemberPlanRule();
+				member.setInsurancePlan(insurancePlan);
+				member.setRelation(Relation.valueOf(relation));
+				member.setGender(relation.equals("SON1") || relation.equals("SON2") || relation.equals("FATHER")
+						|| relation.equals("HUSBAND") ? Gender.MALE : Gender.FEMALE);
+				memberPlanRuleDao.addMember(member);
+			}
+		}
+
+		// Step 5: Add Gold and Platinum if selected and valid
+		if (isGold) {
+			insuranceCoverageOptionDao.addCoveragePlan(coverageOption2);
+		}
+
+		if (isPlatinum) {
+			insuranceCoverageOptionDao.addCoveragePlan(coverageOption3);
+		}
+
+		return "AInsuranceAdminDashBoard.jsp";
 	}
 
 	/**
@@ -1059,7 +1144,10 @@ public class CreateInsuranceController {
 			selectedRelations = relationMap.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey)
 					.collect(Collectors.toList());
 			System.out.println(selectedRelations);
-			if (individualMemberGender == null) {
+			logger.info("and gender is validation if null : " + individualMemberGender);
+
+			if (individualMemberGender == null || individualMemberGender.isEmpty()) {
+				logger.info("and through errror if  gender is null: " + individualMemberGender);
 
 				context.addMessage("companyForm:individualMemberGender",
 						new FacesMessage(FacesMessage.SEVERITY_ERROR, "MUST CHOSSE GENDER", null));
@@ -1088,14 +1176,24 @@ public class CreateInsuranceController {
 			InsuranceCoverageOption goldOption, InsuranceCoverageOption platinumOption) {
 		boolean isValid = true;
 		FacesContext context = FacesContext.getCurrentInstance();
+		logger.info("silver coverage amount is :" + silverOption.getCoverageAmount());
+		logger.info("golve coverage amount is " + goldOption.getCoverageAmount());
+		logger.info("platinium coverage amount is " + platinumOption.getCoverageAmount());
 		if (isSilver && silverOption != null && isGold && goldOption != null) {
-
+			logger.info("we are comparing silver and gold");
 			if (silverOption.getPremiumAmount() > goldOption.getPremiumAmount()) {
+				logger.info("we are comparing silver and gold : "
+						+ (silverOption.getPremiumAmount() > goldOption.getPremiumAmount()));
+				System.out.println("GoldOption PremiumAmount  must be greater than SilverOption premiumAmount");
 				context.addMessage("companyForm:PremiumAmount2", new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"GoldOption PremiumAmount  must be greater than SilverOption premiumAmount", null));
+
 				isValid = false;
 			}
 			if (silverOption.getCoverageAmount() > goldOption.getCoverageAmount()) {
+				logger.info("we are comparing silver and gold : "
+						+ (silverOption.getCoverageAmount() > goldOption.getCoverageAmount()));
+
 				context.addMessage("companyForm:CoverageAmount2", new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"GoldOption CoverageAmount  must be greater than SilverOption CoverageAmount", null));
 				isValid = false;
@@ -1103,15 +1201,23 @@ public class CreateInsuranceController {
 
 		}
 		if (isGold && goldOption != null && isPlatinum && platinumOption != null) {
-
+			logger.info("we are comparing platinum and gold : "
+					+ (silverOption.getPremiumAmount() > goldOption.getPremiumAmount()));
 			if (goldOption.getPremiumAmount() > platinumOption.getPremiumAmount()) {
+				logger.info("we are comparing silver and gold : "
+						+ (goldOption.getPremiumAmount() > platinumOption.getPremiumAmount()));
+				logger.info("we are comparing silver and gold : "
+						+ (goldOption.getPremiumAmount() > platinumOption.getPremiumAmount()));
+
 				context.addMessage("companyForm:PremiumAmount3", new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"platinumOption PremiumAmount  must be greater than goldOption premiumAmount", null));
 				isValid = false;
 			}
 			if (goldOption.getCoverageAmount() > platinumOption.getCoverageAmount()) {
-				context.addMessage(
-						"companyForm:CoverageAmount3", new FacesMessage(FacesMessage.SEVERITY_ERROR,
+				logger.info("we are comparing silver and gold : "
+						+ (goldOption.getCoverageAmount() > platinumOption.getCoverageAmount()));
+
+				context.addMessage("companyForm:CoverageAmount3", new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"platinumOption CoverageAmount  must be greater than goldOption CoverageAmount", null));
 				isValid = false;
 			}

@@ -1,4 +1,18 @@
+/**
+ * Copyright © 2025 Infinite Computer Solution. All rights reserved.
+ */
+
+/**
+ * This package contains controller and utility classes for managing administrative tasks
+ * such as pharmacy review, approval workflows, and related operations in the JSF application.
+ */
+
 package com.infinite.jsf.admin.controller;
+
+/**
+ * Enum class containing constant messages used during pharmacy approval
+ * processes, including validation, approval status, and user notifications.
+ */
 
 public enum ConstMessage {
 

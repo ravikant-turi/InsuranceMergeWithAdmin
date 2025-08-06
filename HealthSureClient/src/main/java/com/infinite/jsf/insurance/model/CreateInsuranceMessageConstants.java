@@ -1,16 +1,28 @@
+/**
+ * Copyright © 2025 Infinite Computer Solutions. All rights reserved.
+ *
+ */
+
+/**
+ * Package: com.infinite.jsf.insurance.model
+ *
+ * This package contains model classes for the insurance module of the Infinite JSF application.
+ * These classes represent the core business entities and are used for data transfer between
+ * different layers of the application.
+ */
 package com.infinite.jsf.insurance.model;
 
 /**
- * MessageConstants.java
+ * CreateInsuranceMessageConstants.java
  *
- * Singleton class to hold all application-wide message constants. Ensures only
- * one instance is created and accessed in a thread-safe manner.
+ * Singleton-style class to hold all application-wide message constants used in
+ * the insurance creation module. This helps in maintaining consistency and
+ * centralizing message management across the application.
  *
- * Copyright © 2025 Infinite Computer Solution. All rights reserved.
  */
 public class CreateInsuranceMessageConstants {
 
-	public  final String COVERAGE_AMOUNT_MISMATCH = "Coverage amount does not match available cover amount in SILVER";
+	public final String COVERAGE_AMOUNT_MISMATCH = "Coverage amount does not match available cover amount in SILVER";
 	// maximum member
 	public final String MAX_MEMBER_NEGATIVE = "Maximum member cannot be negative.";
 	public final String MAX_MEMBER_ZERO = "Maximum member cannot be zero.";
@@ -23,11 +35,11 @@ public class CreateInsuranceMessageConstants {
 	public final String PLAN_NAME_TOO_SHORT = "Plan name must be at least 4 characters.";
 	public final String PLAN_NAME_INVALID = "Plan name must contain only alphabetic characters (no digits or special characters).";
 	public final String COMPANY_REQUIRED = "Insurance company is required.";
-	//description
+	// description
 	public final String DESCRIPTION_REQUIRED = "Description is required.";
 	public final String DESCRIPTION_TOO_SHORT = "Description must be more than 5 characters.";
 	public final String DESCRIPTION_INVALID = "Only alphabetic characters are allowed (no digits or special characters).";
-	// coverAmount 
+	// coverAmount
 	public final String COVER_AMOUNT_CANNOT_ZERO = "Cover amount can not be zero";
 	public final String COVER_AMOUNT_REQUIRED = "Cover amount is required.";
 	public final String COVER_AMOUNT_NEGATIVE = "Cover amount must be greater than zero.";

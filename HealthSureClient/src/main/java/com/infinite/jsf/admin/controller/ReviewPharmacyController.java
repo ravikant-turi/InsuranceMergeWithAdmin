@@ -1,22 +1,12 @@
 /**
  * Copyright © 2025 Infinite Computer Solution. All rights reserved.
- *
- * Controller class for handling pharmacy review and approval operations.
- * 
- * <p>
- * This class manages the review process of pharmacies including validation,
- * approval, rejection, and navigation to related views such as medicines,
- * equipment, pharmacists, and dispensed items. It also supports pagination and
- * sorting of pharmacy records.
- * </p>
- *
- * <p>
- * Logging is handled using Log4j, with conditional debug logging enabled to
- * trace internal operations when debugging is turned on.
- * </p>
- *
- * 
  */
+
+/**
+ * This package contains controller classes for managing administrative operations in the JSF-based application,
+ * including pharmacy review, approval workflows, navigation, and integration with pharmacy modules.
+ */
+
 package com.infinite.jsf.admin.controller;
 
 import java.util.ArrayList;
@@ -38,9 +28,18 @@ import com.infinite.jsf.pharmacy.model.Pharmacists;
 import com.infinite.jsf.pharmacy.model.Pharmacy;
 import com.infinite.jsf.util.MailSend;
 
-/* 
+/**
  * Controller class for handling pharmacy review and approval operations.
-*/
+ * 
+ * This class manages the review process of pharmacies including validation,
+ * approval, rejection, and navigation to related views such as medicines,
+ * equipment, pharmacists, and dispensed items. It also supports pagination and
+ * sorting of pharmacy records.
+ * 
+ * Logging is handled using Log4j, with conditional debug logging enabled to
+ * trace internal operations when debugging is turned on.
+ *
+ */
 public class ReviewPharmacyController {
 
 	private Pharmacy pharmacy;
