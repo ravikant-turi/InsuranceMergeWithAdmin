@@ -352,7 +352,8 @@ form {
 				<!-- Row 4 -->
 				<div class="form-row">
 					<div class="form-group">
-						<label>Periodic Diseases:</label>
+						<h:outputLabel escape="false"
+							value="<span style='color:red'>*</span>Periodic Diseases:" />
 						<h:selectOneMenu id="periodicDiseases"
 							value="#{createInsuranceController.insurancePlan.periodicDiseases}">
 							<f:selectItem itemLabel="--Select--" itemValue="" />

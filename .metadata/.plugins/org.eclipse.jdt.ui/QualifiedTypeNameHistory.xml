@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="com.infinite.jsf.pharmacy.model.Medicines"/>
+    <fullyQualifiedTypeName name="org.hibernate.Session"/>
+    <fullyQualifiedTypeName name="com.infinite.jsf.pharmacy.dao.MedicinesDao"/>
+    <fullyQualifiedTypeName name="java.util.ArrayList"/>
+    <fullyQualifiedTypeName name="javax.faces.context.FacesContext"/>
+    <fullyQualifiedTypeName name="com.infinite.jsf.pharmacy.model.Passwords"/>
+    <fullyQualifiedTypeName name="com.infinite.jsf.pharmacy.dao.EquipmentDao"/>
+    <fullyQualifiedTypeName name="java.util.List"/>
+    <fullyQualifiedTypeName name="com.infinite.jsf.pharmacy.model.Equipment"/>
+    <fullyQualifiedTypeName name="com.infinite.jsf.pharmacy.daoImpl.EquipmentDaoImpl"/>
+    <fullyQualifiedTypeName name="com.infinite.jsf.util.SessionHelper"/>
+    <fullyQualifiedTypeName name="org.hibernate.Query"/>
+    <fullyQualifiedTypeName name="java.io.Serializable"/>
+    <fullyQualifiedTypeName name="javax.ejb.Remote"/>
+    <fullyQualifiedTypeName name="com.infinite.ejb.pharmacy.dao.UpdateEquipments"/>
+    <fullyQualifiedTypeName name="com.infinite.ejb.pharmacy.dao.UpdateMedicines"/>
+    <fullyQualifiedTypeName name="com.infinite.ejb.pharmacy.dao.UpdateEquipmentsDao"/>
+    <fullyQualifiedTypeName name="com.infinite.ejb.pharmacy.dao.UpdateMedicinesDao"/>
+    <fullyQualifiedTypeName name="com.infinite.ejb.util.ConnectionHelper"/>
+    <fullyQualifiedTypeName name="com.infinite.ejb.pharmacy.daoImpl.UpdateMedicinesDaoImpl"/>
+    <fullyQualifiedTypeName name="com.infinite.ejb.pharmacy.bean.PharmacyBeanRemote"/>
+    <fullyQualifiedTypeName name="com.infinite.ejb.pharmacy.model.Medicines"/>
+</qualifiedTypeNameHistroy>

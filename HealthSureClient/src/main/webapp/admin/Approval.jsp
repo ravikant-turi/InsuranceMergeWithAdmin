@@ -3,7 +3,7 @@
  
   Author: Ravikant turi
  
-  Description:  Pharmacy Approval
+  Description:  Pharmacy Approval By Admin
 -->
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
@@ -124,8 +124,6 @@ h\:dataTable tr:hover td {
 
 .action-button:hover:not(:disabled) {
 	background-color: #003d99; /* Darker blue */
-	transform: scale(1.07);
-	box-shadow: 0 6px 15px rgba(0, 61, 153, 0.5);
 }
 
 .action-button:disabled {
@@ -189,6 +187,21 @@ th a, th a:visited {
 	background: none;
 	padding: 0;
 	margin: 0;
+}
+
+.status-ACCEPTED {
+	color: green;
+	font-weight: 500;
+}
+
+.status-PENDING {
+	color: orange;
+	font-weight: 500;
+}
+
+.status-REJECTED {
+	color: red;
+	font-weight: 500;
 }
 </style>
 </head>
@@ -435,7 +448,9 @@ th a, th a:visited {
 								</h:panelGroup>
 							</h:panelGroup>
 						</f:facet>
-						<h:outputText value="#{pharmacy.status}" />
+						<h:outputText value="#{pharmacy.status}"
+							styleClass="status-#{pharmacy.status}" />
+
 					</h:column>
 
 				</h:dataTable>

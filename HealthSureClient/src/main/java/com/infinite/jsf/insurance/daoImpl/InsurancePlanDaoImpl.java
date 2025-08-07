@@ -11,6 +11,7 @@
 package com.infinite.jsf.insurance.daoImpl;
 
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -19,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.infinite.jsf.insurance.dao.InsurancePlanDao;
+import com.infinite.jsf.insurance.exception.InsurancePlanExcetpiong;
 import com.infinite.jsf.insurance.model.InsurancePlan;
 import com.infinite.jsf.util.SessionHelper;
 
@@ -56,7 +58,13 @@ public class InsurancePlanDaoImpl implements InsurancePlanDao {
 			trans.commit();
 			logger.info("Plan is save with this planId :" + planId);
 			return planId;
-		} catch (Exception e) {
+
+		} 
+//			catch (HibernateException e) {
+//		 new InsurancePlanExcetpiong("plan is not saved", e);
+//		}
+
+		catch (Exception e) {
 			if (trans != null)
 				trans.rollback();
 			logger.error("Plan is not save with this planId :" + e.getMessage(), e);
