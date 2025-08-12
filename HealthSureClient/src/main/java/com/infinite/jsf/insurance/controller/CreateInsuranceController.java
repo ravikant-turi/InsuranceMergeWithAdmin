@@ -1373,6 +1373,8 @@ public class CreateInsuranceController {
 		logger.info("platinium PremiumAmount amount is " + platinumOption.getPremiumAmount());
 
 		System.out.println("=====check for silve and  gold ==========");
+
+		
 		if (isSilver && silverOption != null && isGold && goldOption != null) {
 			if (silverOption.getPremiumAmount() > goldOption.getPremiumAmount()) {
 				context.addMessage("companyForm:PremiumAmount2", new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -1392,6 +1394,7 @@ public class CreateInsuranceController {
 			}
 
 		}
+
 		if (isGold && goldOption != null && isPlatinum && platinumOption != null) {
 
 			if (goldOption.getPremiumAmount() > platinumOption.getPremiumAmount()) {
