@@ -10,6 +10,8 @@
 package com.infinite.jsf.admin.dao;
 
 import java.util.List;
+
+import com.infinite.jsf.admin.exception.ReviewPharmacyException;
 import com.infinite.jsf.pharmacy.model.Pharmacy;
 
 /**
@@ -29,8 +31,9 @@ public interface ReviewPharmacyaDao {
 	 * Retrieves a list of all pharmacies pending review.
 	 *
 	 * @return List of Pharmacy objects to be reviewed
+	 * @throws ReviewPharmacyException 
 	 */
-	List<Pharmacy> reviewPharmacyDetails();
+	List<Pharmacy> reviewPharmacyDetails() throws ReviewPharmacyException;
 
 	/**
 	 * Searches for a pharmacy by its unique ID.
@@ -46,6 +49,7 @@ public interface ReviewPharmacyaDao {
 	 * @param pharmacy the Pharmacy object to update
 	 * @param status   the new status to set
 	 * @return a message indicating the result of the update
+	 * @throws ReviewPharmacyException 
 	 */
-	String updatePharmacyStatus(Pharmacy pharmacy, String status);
+	String updatePharmacyStatus(Pharmacy pharmacy, String status) throws ReviewPharmacyException;
 }

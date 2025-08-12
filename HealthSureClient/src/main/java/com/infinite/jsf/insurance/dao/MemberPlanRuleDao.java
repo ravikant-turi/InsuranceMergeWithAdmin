@@ -10,6 +10,7 @@ package com.infinite.jsf.insurance.dao;
 
 import java.util.List;
 
+import com.infinite.jsf.insurance.exception.MemberPlanException;
 import com.infinite.jsf.insurance.model.MemberPlanRule;
 
 /**
@@ -23,31 +24,18 @@ public interface MemberPlanRuleDao {
 	 *
 	 * @param member the Member object to be added
 	 * @return status message
+	 * @throws MemberPlanException 
 	 */
-	String addMember(MemberPlanRule member);
+	String addMember(MemberPlanRule member) throws MemberPlanException;
 
-	/**
-	 * Retrieves all members associated with a specific coverage ID.
-	 *
-	 * @param coverageId the coverage ID to filter members
-	 * @return list of Member objects
-	 */
-	List<MemberPlanRule> findAllMeberByCoverageId(String coverageId);
-
-	/**
-	 * Updates an existing member record.
-	 *
-	 * @param member the Member object with updated data
-	 * @return status message
-	 */
-	String updateMember(MemberPlanRule member);
 
 	/**
 	 * Retrieves all members associated with a specific plan ID.
 	 *
 	 * @param planId the plan ID to filter members
 	 * @return list of MemberPlanRule objects
+	 * @throws MemberPlanException 
 	 */
-	List<MemberPlanRule> searchMemberByPlanId(String planId);
+	List<MemberPlanRule> searchMemberByPlanId(String planId) throws MemberPlanException;
 
 }

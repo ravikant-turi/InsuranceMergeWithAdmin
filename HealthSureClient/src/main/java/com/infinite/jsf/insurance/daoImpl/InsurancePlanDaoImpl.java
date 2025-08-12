@@ -7,22 +7,29 @@
  * This package contains the implementation classes for DAO (Data Access Object)
  * related to the insurance module 
  */
-
 package com.infinite.jsf.insurance.daoImpl;
-
-import org.apache.log4j.Logger;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
+import org.hibernate.NonUniqueResultException;
+import org.hibernate.ObjectNotFoundException;
+import org.hibernate.QueryTimeoutException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.StaleStateException;
+import org.hibernate.Transaction;
+import org.hibernate.exception.JDBCConnectionException;
+import org.hibernate.exception.SQLGrammarException;
+
 import com.infinite.jsf.insurance.dao.InsurancePlanDao;
-import com.infinite.jsf.insurance.exception.InsurancePlanExcetpiong;
+import com.infinite.jsf.insurance.exception.InsurancePlanException;
 import com.infinite.jsf.insurance.model.InsurancePlan;
 import com.infinite.jsf.util.SessionHelper;
+
+import jakarta.validation.ConstraintViolationException;
 
 /**
  *
@@ -41,16 +48,17 @@ public class InsurancePlanDaoImpl implements InsurancePlanDao {
 	 *
 	 * @param insurancePlan the InsurancePlan object to be added
 	 * @return the generated plan ID if successful, otherwise null
+	 * @throws InsurancePlanExcetping
+	 * @throws HibernateException
+	 * @throws InsurancePlanExcetpiong
 	 */
 	@Override
-	public String addInsurancePlan(InsurancePlan insurancePlan) {
+	public String addInsurancePlan(InsurancePlan insurancePlan) throws InsurancePlanException {
 		String planId = generateNextPlanId();
 		insurancePlan.setPlanId(planId);
 		insurancePlan.setActiveOn(new Date());
-
 		Session session = null;
 		Transaction trans = null;
-
 		try {
 			session = factory.openSession();
 			trans = session.beginTransaction();
@@ -58,17 +66,26 @@ public class InsurancePlanDaoImpl implements InsurancePlanDao {
 			trans.commit();
 			logger.info("Plan is save with this planId :" + planId);
 			return planId;
-
-		} 
-//			catch (HibernateException e) {
-//		 new InsurancePlanExcetpiong("plan is not saved", e);
-//		}
-
-		catch (Exception e) {
+		} catch (ConstraintViolationException e) {
 			if (trans != null)
 				trans.rollback();
-			logger.error("Plan is not save with this planId :" + e.getMessage(), e);
-			return null;
+			logger.error("Constraint violation: " + e.getMessage(), e);
+			throw new InsurancePlanException("Constraint violation: plan not saved", e);
+		} catch (JDBCConnectionException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Database connection error: " + e.getMessage(), e);
+			throw new InsurancePlanException("Database connection error: plan not saved", e);
+		} catch (HibernateException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Hibernate error: " + e.getMessage(), e);
+			throw new InsurancePlanException("Hibernate error: plan not saved", e);
+		} catch (Exception e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Unexpected error while saving plan: " + e.getMessage(), e);
+			throw new InsurancePlanException("Unexpected error: plan not saved", e);
 		} finally {
 			if (session != null)
 				session.close();
@@ -80,7 +97,7 @@ public class InsurancePlanDaoImpl implements InsurancePlanDao {
 	 *
 	 * @return the next generated plan ID
 	 */
-	public String generateNextPlanId() {
+	public String generateNextPlanId() throws InsurancePlanException {
 		Session session = null;
 		String lastId = null;
 
@@ -89,19 +106,47 @@ public class InsurancePlanDaoImpl implements InsurancePlanDao {
 			lastId = (String) session.createQuery("SELECT p.planId FROM InsurancePlan p ORDER BY p.planId DESC")
 					.setMaxResults(1).uniqueResult();
 			logger.debug("Last plan ID fetched: " + lastId);
+
+		} catch (JDBCConnectionException e) {
+			logger.error("Database connection error while generating plan ID", e);
+			throw new InsurancePlanException(" Database connection error : Fails to connect database", e);
+
+		} catch (SQLGrammarException e) {
+			logger.error("SQL syntax error in plan ID query", e);
+			throw new InsurancePlanException("SQL syntax error", e);
+
+		} catch (QueryTimeoutException e) {
+			logger.error("Query timed out while fetching last plan ID", e);
+			throw new InsurancePlanException("Query timeout", e);
+
+		} catch (NonUniqueResultException e) {
+			logger.error("Multiple results found when expecting one", e);
+			throw new InsurancePlanException("Non-unique result error", e);
+
+		} catch (HibernateException e) {
+			logger.error("Hibernate error while generating plan ID", e);
+			throw new InsurancePlanException("Hibernate error", e);
+
 		} catch (Exception e) {
-			logger.error("Error generating next plan ID", e);
+			logger.error("Unexpected error while generating plan ID", e);
+			throw new InsurancePlanException("Unexpected error", e);
+
 		} finally {
 			if (session != null)
 				session.close();
 		}
 
 		int nextNum = 1;
-		if (lastId != null && lastId.toUpperCase().startsWith("PLA") && lastId.length() == 6) {
-			String numPart = lastId.substring(3); // e.g., "001"
-			if (numPart.matches("\\d{3}")) {
-				nextNum = Integer.parseInt(numPart) + 1;
+		try {
+			if (lastId != null && lastId.toUpperCase().startsWith("PLA") && lastId.length() == 6) {
+				String numPart = lastId.substring(3); // e.g., "001"
+				if (numPart.matches("\\d{3}")) {
+					nextNum = Integer.parseInt(numPart) + 1;
+				}
 			}
+		} catch (NumberFormatException e) {
+			logger.error("Error parsing numeric part of plan ID", e);
+			throw new InsurancePlanException("Invalid numeric format in last plan ID", e);
 		}
 
 		String nextId = String.format("PLA%03d", nextNum);
@@ -116,7 +161,7 @@ public class InsurancePlanDaoImpl implements InsurancePlanDao {
 	 * @return the InsurancePlan object if found, otherwise null
 	 */
 	@Override
-	public InsurancePlan findInsuranceById(String planId) {
+	public InsurancePlan findInsuranceById(String planId) throws InsurancePlanException {
 		Session session = null;
 		Transaction trans = null;
 		InsurancePlan plan = null;
@@ -127,10 +172,43 @@ public class InsurancePlanDaoImpl implements InsurancePlanDao {
 			plan = (InsurancePlan) session.get(InsurancePlan.class, planId);
 			trans.commit();
 			logger.info("Insurance plan fetched for ID: " + planId);
+
+		} catch (JDBCConnectionException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Database connection error while fetching plan by ID", e);
+			throw new InsurancePlanException("Database connection error", e);
+
+		} catch (SQLGrammarException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("SQL syntax error while fetching plan by ID", e);
+			throw new InsurancePlanException("SQL syntax error", e);
+
+		} catch (QueryTimeoutException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Query timed out while fetching plan by ID", e);
+			throw new InsurancePlanException("Query timeout", e);
+
+		} catch (ObjectNotFoundException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Plan not found for ID: " + planId, e);
+			throw new InsurancePlanException("Plan not found for ID: " + planId, e);
+
+		} catch (HibernateException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Hibernate error while fetching plan by ID", e);
+			throw new InsurancePlanException("Hibernate error", e);
+
 		} catch (Exception e) {
 			if (trans != null)
 				trans.rollback();
-			logger.error("Error fetching insurance plan by ID", e);
+			logger.error("Unexpected error while fetching plan by ID", e);
+			throw new InsurancePlanException("Unexpected error", e);
+
 		} finally {
 			if (session != null)
 				session.close();
@@ -145,7 +223,7 @@ public class InsurancePlanDaoImpl implements InsurancePlanDao {
 	 * @return a list of InsurancePlan objects
 	 */
 	@Override
-	public List<InsurancePlan> showAllPlan() {
+	public List<InsurancePlan> showAllPlan() throws InsurancePlanException {
 		List<InsurancePlan> planList = null;
 		Session session = null;
 		Transaction trans = null;
@@ -156,10 +234,37 @@ public class InsurancePlanDaoImpl implements InsurancePlanDao {
 			planList = session.createQuery("FROM InsurancePlan").list();
 			trans.commit();
 			logger.info("Fetched all insurance plans. Total: " + (planList != null ? planList.size() : 0));
+
+		} catch (JDBCConnectionException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Database connection error while fetching all plans", e);
+			throw new InsurancePlanException("Database connection error", e);
+
+		} catch (SQLGrammarException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("SQL syntax error while fetching all plans", e);
+			throw new InsurancePlanException("SQL syntax error", e);
+
+		} catch (QueryTimeoutException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Query timed out while fetching all plans", e);
+			throw new InsurancePlanException("Query timeout", e);
+
+		} catch (HibernateException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Hibernate error while fetching all plans", e);
+			throw new InsurancePlanException("Hibernate error", e);
+
 		} catch (Exception e) {
 			if (trans != null)
 				trans.rollback();
-			logger.error("Error fetching all insurance plans", e);
+			logger.error("Unexpected error while fetching all plans", e);
+			throw new InsurancePlanException("Unexpected error", e);
+
 		} finally {
 			if (session != null)
 				session.close();
@@ -175,7 +280,7 @@ public class InsurancePlanDaoImpl implements InsurancePlanDao {
 	 * @return "success" if update is successful, otherwise "failure"
 	 */
 	@Override
-	public String updateInsurancePlan(InsurancePlan insurancePlan) {
+	public String updateInsurancePlan(InsurancePlan insurancePlan) throws InsurancePlanException {
 		Session session = null;
 		Transaction trans = null;
 
@@ -186,14 +291,47 @@ public class InsurancePlanDaoImpl implements InsurancePlanDao {
 			trans.commit();
 			logger.info("Insurance plan updated successfully for ID: " + insurancePlan.getPlanId());
 			return "success";
+
+		} catch (JDBCConnectionException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Database connection error while updating plan", e);
+			throw new InsurancePlanException("Database connection error", e);
+
+		} catch (SQLGrammarException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("SQL syntax error while updating plan", e);
+			throw new InsurancePlanException("SQL syntax error", e);
+
+		} catch (StaleStateException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Attempted to update a non-existent or detached entity", e);
+			throw new InsurancePlanException("Entity not found or stale", e);
+
+		} catch (ConstraintViolationException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Constraint violation while updating plan", e);
+			throw new InsurancePlanException("Constraint violation", e);
+
+		} catch (HibernateException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Hibernate error while updating plan", e);
+			throw new InsurancePlanException("Hibernate error", e);
+
 		} catch (Exception e) {
 			if (trans != null)
 				trans.rollback();
-			logger.error("Error updating insurance plan", e);
-			return "failure";
+			logger.error("Unexpected error while updating plan", e);
+			throw new InsurancePlanException("Unexpected error", e);
+
 		} finally {
 			if (session != null)
 				session.close();
 		}
 	}
+
 }

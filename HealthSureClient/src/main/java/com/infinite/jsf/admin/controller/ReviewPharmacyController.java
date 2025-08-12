@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 
 import com.infinite.jsf.admin.dao.ReviewPharmacyaDao;
 import com.infinite.jsf.admin.daoImpl.ReviewPharmacyaDaoImpl;
+import com.infinite.jsf.admin.exception.ReviewPharmacyException;
 import com.infinite.jsf.pharmacy.model.DispensedEquipments;
 import com.infinite.jsf.pharmacy.model.DispensedMedicines;
 import com.infinite.jsf.pharmacy.model.Equipment;
@@ -57,10 +58,18 @@ public class ReviewPharmacyController {
 	private static final Logger logger = Logger.getLogger(ReviewPharmacyController.class);
 
 	public ReviewPharmacyController() {
+
+		FacesContext context = FacesContext.getCurrentInstance();
 		if (logger.isDebugEnabled()) {
 			logger.debug("Fetching all pharmacies for review.");
 		}
-		allPharmacies = reviewPharmacyaDao.reviewPharmacyDetails();
+		try {
+			allPharmacies = reviewPharmacyaDao.reviewPharmacyDetails();
+		} catch (ReviewPharmacyException e) {
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error : ",
+					"Error accured while fetchig the pharamcy Data"));
+
+		}
 		sortAndPaginate();
 	}
 
@@ -260,7 +269,16 @@ public class ReviewPharmacyController {
 
 		if (validatePharmacyDetails(pharmacy)) {
 
-			reviewPharmacyaDao.updatePharmacyStatus(pharmacy, "ACCEPTED");
+			try {
+				reviewPharmacyaDao.updatePharmacyStatus(pharmacy, "ACCEPTED");
+			} catch (ReviewPharmacyException e) {
+				
+				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+						ConstMessage.PHARMACY_UPDATE_ERROR.getMessage()));
+				return null;
+				
+
+			}
 
 			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
 					pharmacy.getPharmacyId() + " " + ConstMessage.APPROVED_SUCCESSFULLY.getMessage(), null));
@@ -269,7 +287,13 @@ public class ReviewPharmacyController {
 
 		} else {
 
-			reviewPharmacyaDao.updatePharmacyStatus(pharmacy, "REJECTED");
+			try {
+				reviewPharmacyaDao.updatePharmacyStatus(pharmacy, "REJECTED");
+			} catch (ReviewPharmacyException e) {
+				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error:",
+						ConstMessage.PHARMACY_UPDATE_ERROR.getMessage()));
+				return null;
+			}
 
 			String htmlContent = String.format(ConstMessage.REJECTED_HTML_TEMPLATE.getMessage(), showValidatinMessage);
 

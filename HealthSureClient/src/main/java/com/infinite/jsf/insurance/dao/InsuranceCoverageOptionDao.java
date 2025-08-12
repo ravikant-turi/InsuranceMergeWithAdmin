@@ -10,6 +10,7 @@ package com.infinite.jsf.insurance.dao;
 
 import java.util.List;
 
+import com.infinite.jsf.insurance.exception.InsuranceCoverageOptionException;
 import com.infinite.jsf.insurance.model.InsuranceCoverageOption;
 
 /**
@@ -24,31 +25,27 @@ public interface InsuranceCoverageOptionDao {
 	 *
 	 * @param coverageOption the coverage option to be added
 	 * @return status message
+	 * @throws InsuranceCoverageOptionException
 	 */
-	String addCoveragePlan(InsuranceCoverageOption coverageOption);
+	String addCoveragePlan(InsuranceCoverageOption coverageOption) throws InsuranceCoverageOptionException;
 
 	/**
 	 * Retrieves all insurance coverage options.
 	 *
 	 * @return list of all coverage options
+	 * @throws InsuranceCoverageOptionException 
 	 */
-	List<InsuranceCoverageOption> findAllInsuranceCoverageOptions();
+	List<InsuranceCoverageOption> findAllInsuranceCoverageOptions() throws InsuranceCoverageOptionException;
 
 	/**
 	 * Retrieves coverage options by plan ID.
 	 *
 	 * @param planId the plan ID to filter coverage options
 	 * @return list of coverage options for the given plan ID
+	 * @throws InsuranceCoverageOptionException
 	 */
-	List<InsuranceCoverageOption> findAllInsuranceCoverageOptionsByPlanId(String planId);
-
-	/**
-	 * Retrieves coverage options by plan type.
-	 *
-	 * @param planType the plan type to filter coverage options
-	 * @return list of coverage options for the given plan type
-	 */
-	List<InsuranceCoverageOption> findAllInsuranceCoverageOptionsByPlanType(String planType);
+	List<InsuranceCoverageOption> findAllInsuranceCoverageOptionsByPlanId(String planId)
+			throws InsuranceCoverageOptionException;
 
 	/**
 	 * Finds a specific coverage option by its ID.
@@ -63,6 +60,7 @@ public interface InsuranceCoverageOptionDao {
 	 *
 	 * @param coverageOption the coverage option with updated data
 	 * @return status message
+	 * @throws InsuranceCoverageOptionException 
 	 */
-	String updateInsuranceCoverageOption(InsuranceCoverageOption coverageOption);
+	String updateInsuranceCoverageOption(InsuranceCoverageOption coverageOption) throws InsuranceCoverageOptionException;
 }

@@ -10,12 +10,18 @@ package com.infinite.jsf.insurance.daoImpl;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.QueryTimeoutException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.exception.JDBCConnectionException;
+import org.hibernate.exception.SQLGrammarException;
 
 import com.infinite.jsf.insurance.dao.MemberPlanRuleDao;
+import com.infinite.jsf.insurance.exception.MemberPlanException;
 import com.infinite.jsf.insurance.model.MemberPlanRule;
 import com.infinite.jsf.util.SessionHelper;
 
@@ -35,7 +41,7 @@ public class MemberPlanRuleDaoImpl implements MemberPlanRuleDao {
 	 * @return "success" if the operation is successful
 	 */
 	@Override
-	public String addMember(MemberPlanRule member) {
+	public String addMember(MemberPlanRule member) throws MemberPlanException {
 		Transaction trans = null;
 		Session session = null;
 		String memberId = generateNextMemberId();
@@ -50,11 +56,37 @@ public class MemberPlanRuleDaoImpl implements MemberPlanRuleDao {
 			trans.commit();
 			logger.info("Member saved successfully with ID: " + memberId);
 			return "success";
+
+		} catch (JDBCConnectionException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Database connection error while saving member", e);
+			throw new MemberPlanException("Database connection error", e);
+
+		} catch (SQLGrammarException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("SQL syntax error while saving member", e);
+			throw new MemberPlanException("SQL syntax error", e);
+
+		} catch (ConstraintViolationException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Constraint violation while saving member", e);
+			throw new MemberPlanException("Constraint violation", e);
+
+		} catch (HibernateException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Hibernate error while saving member", e);
+			throw new MemberPlanException("Hibernate error", e);
+
 		} catch (Exception e) {
 			if (trans != null)
 				trans.rollback();
-			logger.error("Error while saving member", e);
-			return "failure";
+			logger.error("Unexpected error while saving member", e);
+			throw new MemberPlanException("Unexpected error", e);
+
 		} finally {
 			if (session != null)
 				session.close();
@@ -66,7 +98,8 @@ public class MemberPlanRuleDaoImpl implements MemberPlanRuleDao {
 	 *
 	 * @return the next generated member ID
 	 */
-	public String generateNextMemberId() {
+
+	public String generateNextMemberId() throws MemberPlanException {
 		Session session = null;
 		String lastId = null;
 
@@ -75,50 +108,48 @@ public class MemberPlanRuleDaoImpl implements MemberPlanRuleDao {
 			lastId = (String) session.createQuery("SELECT m.meberId FROM MemberPlanRule m ORDER BY m.meberId DESC")
 					.setMaxResults(1).uniqueResult();
 			logger.debug("Last member ID fetched: " + lastId);
+
+		} catch (JDBCConnectionException e) {
+			logger.error("Database connection error while fetching last member ID", e);
+			throw new MemberPlanException("Database connection error", e);
+
+		} catch (SQLGrammarException e) {
+			logger.error("SQL syntax error while fetching last member ID", e);
+			throw new MemberPlanException("SQL syntax error", e);
+
+		} catch (QueryTimeoutException e) {
+			logger.error("Query timed out while fetching last member ID", e);
+			throw new MemberPlanException("Query timeout", e);
+
+		} catch (HibernateException e) {
+			logger.error("Hibernate error while fetching last member ID", e);
+			throw new MemberPlanException("Hibernate error", e);
+
 		} catch (Exception e) {
-			logger.error("Error fetching last member ID", e);
+			logger.error("Unexpected error while fetching last member ID", e);
+			throw new MemberPlanException("Unexpected error", e);
+
 		} finally {
 			if (session != null)
 				session.close();
 		}
 
 		int nextNum = 1;
-		if (lastId != null && lastId.toUpperCase().startsWith("MEM") && lastId.length() == 6) {
-			String numPart = lastId.substring(3);
-			if (numPart.matches("\\d{3}")) {
-				nextNum = Integer.parseInt(numPart) + 1;
+		try {
+			if (lastId != null && lastId.toUpperCase().startsWith("MEM") && lastId.length() == 6) {
+				String numPart = lastId.substring(3); // e.g., "001"
+				if (numPart.matches("\\d{3}")) {
+					nextNum = Integer.parseInt(numPart) + 1;
+				}
 			}
+		} catch (NumberFormatException e) {
+			logger.error("Error parsing numeric part of member ID", e);
+			throw new MemberPlanException("Invalid numeric format in last member ID", e);
 		}
 
 		String nextId = String.format("MEM%03d", nextNum);
 		logger.debug("Next generated member ID: " + nextId);
 		return nextId;
-	}
-
-	/**
-	 * Retrieves all MemberPlanRule records associated with a specific coverage ID.
-	 * (Currently not implemented)
-	 *
-	 * @param coverageId the coverage ID to filter members
-	 * @return list of MemberPlanRule objects or null
-	 */
-	@Override
-	public List<MemberPlanRule> findAllMeberByCoverageId(String coverageId) {
-		logger.warn("findAllMeberByCoverageId method is not yet implemented.");
-		return null;
-	}
-
-	/**
-	 * Updates an existing MemberPlanRule record in the database. (Currently not
-	 * implemented)
-	 *
-	 * @param member the MemberPlanRule object with updated data
-	 * @return null
-	 */
-	@Override
-	public String updateMember(MemberPlanRule member) {
-		logger.warn("updateMember method is not yet implemented.");
-		return null;
 	}
 
 	/**
@@ -129,7 +160,7 @@ public class MemberPlanRuleDaoImpl implements MemberPlanRuleDao {
 	 * @return list of MemberPlanRule objects
 	 */
 	@Override
-	public List<MemberPlanRule> searchMemberByPlanId(String planId) {
+	public List<MemberPlanRule> searchMemberByPlanId(String planId) throws MemberPlanException {
 		List<MemberPlanRule> memberList = null;
 		Session session = null;
 		Transaction trans = null;
@@ -145,15 +176,43 @@ public class MemberPlanRuleDaoImpl implements MemberPlanRuleDao {
 
 			trans.commit();
 			logger.info("Members retrieved for plan ID: " + planId);
+
+		} catch (JDBCConnectionException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Database connection error while retrieving members", e);
+			throw new MemberPlanException("Database connection error", e);
+
+		} catch (SQLGrammarException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("SQL syntax error while retrieving members", e);
+			throw new MemberPlanException("SQL syntax error", e);
+
+		} catch (QueryTimeoutException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Query timed out while retrieving members", e);
+			throw new MemberPlanException("Query timeout", e);
+
+		} catch (HibernateException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Hibernate error while retrieving members", e);
+			throw new MemberPlanException("Hibernate error", e);
+
 		} catch (Exception e) {
 			if (trans != null)
 				trans.rollback();
-			logger.error("Error retrieving members by plan ID", e);
+			logger.error("Unexpected error while retrieving members", e);
+			throw new MemberPlanException("Unexpected error", e);
+
 		} finally {
 			if (session != null)
-				session.clear();
+				session.close(); // use close instead of clear
 		}
 
 		return memberList;
 	}
+
 }

@@ -204,6 +204,17 @@ th a, th a:visited {
 	font-weight: 500;
 }
 </style>
+
+<script>
+	window.onload = function() {
+		setTimeout(function() {
+			var msg = document.getElementById('globalMessages');
+			if (msg) {
+				msg.style.display = 'none';
+			}
+		}, 5000); // 5000 milliseconds = 5 seconds
+	};
+</script>
 </head>
 <body>
 
@@ -228,6 +239,7 @@ th a, th a:visited {
            width: auto; max-width: 90%;" />
 
 	<!-- ✅ JavaScript for loader and message -->
+
 	<Script>
 		function showLoader() {
 			document.getElementById('loader').style.display = 'block';
@@ -248,6 +260,8 @@ th a, th a:visited {
 	<div class="table-container">
 		<h:form>
 			<h2 style="text-align: center;">PHARMACY REVIEW AND APPROVAL</h2>
+
+
 			<div class="table-container1">
 
 				<h:dataTable value="#{reviewPharmacyController.paginatedPharmacies}"

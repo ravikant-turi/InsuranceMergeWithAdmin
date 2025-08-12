@@ -19,6 +19,7 @@ public enum ConstMessage {
 	INVALID_AADHAR("Invalid Aadhar !! Must start with 'AADHAR' followed by 6 digits."),
 	INVALID_LICENSE("Invalid License No! Must start with 'LIC' followed by 5 digits."),
 	INVALID_GST("Invalid GST No! Must start with 'GSTIN', followed by 4 digits and end with 2 uppercase letters."),
+	PHARMACY_UPDATE_ERROR ("Error occurred while updating the Pharmacy Status"),
 
 	APPROVED_SUCCESSFULLY("Approved successfully"), REJECTED_SUBJECT("PHARMACY STATUS : REJECTED"),
 	REJECTED_HTML_TEMPLATE("<h2 style='color:red;'>Pharmacy Review Status: Rejected</h2>" + "<p>Dear Pharmacy,</p>"

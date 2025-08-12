@@ -11,12 +11,17 @@ package com.infinite.jsf.admin.daoImpl;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.exception.JDBCConnectionException;
+import org.hibernate.exception.SQLGrammarException;
 
 import com.infinite.jsf.admin.dao.ReviewPharmacyaDao;
+import com.infinite.jsf.admin.exception.ReviewPharmacyException;
+import com.infinite.jsf.insurance.exception.InsurancePlanException;
 import com.infinite.jsf.pharmacy.model.Pharmacy;
 import com.infinite.jsf.util.MailSend;
 import com.infinite.jsf.util.SessionHelper;
@@ -41,9 +46,10 @@ public class ReviewPharmacyaDaoImpl implements ReviewPharmacyaDao {
 	 * Fetches all pharmacy records for review.
 	 *
 	 * @return List of Pharmacy objects
+	 * @throws ReviewPharmacyException
 	 */
 	@Override
-	public List<Pharmacy> reviewPharmacyDetails() {
+	public List<Pharmacy> reviewPharmacyDetails() throws ReviewPharmacyException {
 		List<Pharmacy> pharmacies = null;
 		Transaction trans = null;
 
@@ -59,6 +65,23 @@ public class ReviewPharmacyaDaoImpl implements ReviewPharmacyaDao {
 			if (logger.isInfoEnabled()) {
 				logger.info("Fetched " + pharmacies.size() + " pharmacies for review.");
 			}
+		} catch (JDBCConnectionException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Database connection error while fetching all Pharamcy", e);
+			throw new ReviewPharmacyException("Database connection error", e);
+
+		} catch (SQLGrammarException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("SQL syntax error while fetching all Pharmacy", e);
+			throw new ReviewPharmacyException("SQL syntax error", e);
+
+		} catch (HibernateException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Hibernate error while fetching all plans", e);
+			throw new ReviewPharmacyException("Hibernate error", e);
 		} catch (Exception e) {
 			if (trans != null)
 				trans.rollback();
@@ -115,9 +138,10 @@ public class ReviewPharmacyaDaoImpl implements ReviewPharmacyaDao {
 	 * @param pharmacy the Pharmacy object to update
 	 * @param status   the new status to set (e.g., ACCEPTED or REJECTED)
 	 * @return "updated" if successful
+	 * @throws ReviewPharmacyException
 	 */
 	@Override
-	public String updatePharmacyStatus(Pharmacy pharmacy, String status) {
+	public String updatePharmacyStatus(Pharmacy pharmacy, String status) throws ReviewPharmacyException {
 		Transaction trans = null;
 
 		try {
@@ -139,6 +163,24 @@ public class ReviewPharmacyaDaoImpl implements ReviewPharmacyaDao {
 			}
 
 			return "updated";
+
+		} catch (JDBCConnectionException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Database connection failed", e);
+			throw new ReviewPharmacyException("Database connection error  while fetching all Pharamcy", e);
+		} catch (SQLGrammarException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("SQL syntax error", e);
+			throw new ReviewPharmacyException("SQL error in query  while fetching all Pharamcy", e);
+		}
+
+		catch (HibernateException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Hibernate error while fetching all Pharamcy", e);
+			throw new ReviewPharmacyException("Hibernate error", e);
 		} catch (Exception e) {
 			if (trans != null)
 				trans.rollback();

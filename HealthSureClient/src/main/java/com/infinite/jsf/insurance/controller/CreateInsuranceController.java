@@ -32,6 +32,9 @@ import com.infinite.jsf.insurance.daoImpl.InsuranceCompanyDaoImpl;
 import com.infinite.jsf.insurance.daoImpl.InsuranceCoverageOptionDaoImpl;
 import com.infinite.jsf.insurance.daoImpl.InsurancePlanDaoImpl;
 import com.infinite.jsf.insurance.daoImpl.MemberPlanRuleDaoImpl;
+import com.infinite.jsf.insurance.exception.InsuranceCoverageOptionException;
+import com.infinite.jsf.insurance.exception.InsurancePlanException;
+import com.infinite.jsf.insurance.exception.MemberPlanException;
 import com.infinite.jsf.insurance.model.CoveragePlanStatus;
 import com.infinite.jsf.insurance.model.CoverageType;
 import com.infinite.jsf.insurance.model.Gender;
@@ -177,7 +180,13 @@ public class CreateInsuranceController {
 	 */
 
 	public List<InsurancePlan> showAllPlan() {
-		planList = insurancplanDao.showAllPlan();
+		FacesContext context = FacesContext.getCurrentInstance();
+		try {
+			planList = insurancplanDao.showAllPlan();
+		} catch (InsurancePlanException e) {
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+					"An error occurred while fetching the data."));
+		}
 		System.out.println(planList);
 		return planList;
 	}
@@ -196,6 +205,7 @@ public class CreateInsuranceController {
 	 * @return Navigation outcome or status string indicating success or failure.
 	 */
 	public String addSilverOnlyMendatorytemp() {
+		FacesContext context = FacesContext.getCurrentInstance();
 
 		System.out.println(insurancePlan + " null : " + insurancePlan == null);
 		System.out.println(coverageOption1 + " null : " + coverageOption1 == null);
@@ -205,6 +215,7 @@ public class CreateInsuranceController {
 		insurancePlan.setInsuranceCompany(insuranceCompany);
 		if (insurancePlan.getActiveOn() != null) {
 			insurancePlan.setExpireDate(calculateExpiryDate(insurancePlan.getActiveOn(), yearsToAdd));
+
 		}
 		insurancePlan.setCreatedOn(new Date());
 		coverageOption1.setInsurancePlan(insurancePlan);
@@ -226,16 +237,33 @@ public class CreateInsuranceController {
 					&& validateInsuranceCoverageOptionWithFacesMessage1(coverageOption1)
 					&& validateInsuranceMeberRelationsWithFacesMessage(insurancePlan)
 					&& validateInsuranceMeberRelationsWithFacesMessage(insurancePlan)) {
-				insurancplanDao.addInsurancePlan(insurancePlan);
+				try {
+					insurancplanDao.addInsurancePlan(insurancePlan);
+				} catch (InsurancePlanException e) {
+					context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+							"An error occurred while adding the insurancePlan."));
+				}
 				coverageOption1.setInsurancePlan(insurancePlan);
-				insuranceCoverageOptionDao.addCoveragePlan(coverageOption1);
+				try {
+					insuranceCoverageOptionDao.addCoveragePlan(coverageOption1);
+				} catch (InsuranceCoverageOptionException e) {
+					context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+							"An error occurred while adding the coveragePlan."));
+
+				}
 				if (insurancePlan.getPlanType() == PlanType.INDIVIDUAL) {
 					logger.info("we are inside individual type to make member object");
 					MemberPlanRule member = new MemberPlanRule();
 					member.setInsurancePlan(insurancePlan);
 					member.setRelation(Relation.INDIVIDUAL);
 					member.setGender(Gender.valueOf(individualMemberGender));
-					memberPlanRuleDao.addMember(member);
+					try {
+						memberPlanRuleDao.addMember(member);
+					} catch (MemberPlanException e) {
+						context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+								"An error occurred while adding the insurance member in INDIVIDUAL type."));
+
+					}
 
 				} // family type
 				else {
@@ -249,7 +277,13 @@ public class CreateInsuranceController {
 						} else {
 							member.setGender(Gender.FEMALE);
 						}
-						memberPlanRuleDao.addMember(member);
+						try {
+							memberPlanRuleDao.addMember(member);
+						} catch (MemberPlanException e) {
+							context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+									"An error occurred while adding the insurance member in FAMILY type"));
+
+						}
 					}
 				}
 
@@ -257,13 +291,25 @@ public class CreateInsuranceController {
 						&& validateInsuranceMeberRelationsWithFacesMessage(insurancePlan)
 						&& validateInsuranceCoverageOptionWithFacesMessage2(coverageOption2)) {
 					coverageOption3.setInsurancePlan(insurancePlan);
-					insuranceCoverageOptionDao.addCoveragePlan(coverageOption2);
+					try {
+						insuranceCoverageOptionDao.addCoveragePlan(coverageOption2);
+					} catch (InsuranceCoverageOptionException e) {
+						context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+								"An error occurred while adding the coveragePlan."));
+
+					}
 				}
 				if (isSilver && isPlatinum && validateInsurancePlanWithFacesMessage(insurancePlan)
 						&& validateInsuranceMeberRelationsWithFacesMessage(insurancePlan)
 						&& validateInsuranceCoverageOptionWithFacesMessage3(coverageOption3)) {
 					coverageOption3.setInsurancePlan(insurancePlan);
-					insuranceCoverageOptionDao.addCoveragePlan(coverageOption3);
+					try {
+						insuranceCoverageOptionDao.addCoveragePlan(coverageOption3);
+					} catch (InsuranceCoverageOptionException e) {
+						context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+								"An error occurred while adding the coveragePlan."));
+
+					}
 				}
 
 				return "AInsuranceAdminDashBoard.jsp";
@@ -277,78 +323,159 @@ public class CreateInsuranceController {
 
 	public String addSilverOnlyMendatory() {
 
+		FacesContext context = FacesContext.getCurrentInstance();
+		logger.info("Prepare insurance plan");
 		// Prepare insurance plan
-		// add company (insurance must belong to any company
+		logger.info("adding the company to insurancePlan");
+
+		// add company (insurance must belong to any company)
 		insurancePlan.setInsuranceCompany(insuranceCompany);
 
 		// insurance expire date calculated dynamically using activeOnDate and duration
 		if (insurancePlan.getActiveOn() != null) {
+			logger.info("adding the expired date using activeOn Date ");
+
 			insurancePlan.setExpireDate(calculateExpiryDate(insurancePlan.getActiveOn(), yearsToAdd));
 		}
 
 		// insuranceplan created date will be today
+		logger.info("add todays date to a insurace createdOn date  ");
+
 		insurancePlan.setCreatedOn(new Date());
 
 		// Link coverage options to the plan
+		logger.info("adding silver option to the insurance plan");
 		coverageOption1.setInsurancePlan(insurancePlan);
+		logger.info("adding gold option to the insurance plan");
+
 		coverageOption2.setInsurancePlan(insurancePlan);
+		logger.info("adding platinum option to the insurance plan");
+
 		coverageOption3.setInsurancePlan(insurancePlan);
 
 		// Step 1: Validate Silver (mandatory)
+		logger.info("checking the condition for silve is mandatory");
 		boolean silverValid = isSilver && validateInsurancePlanWithFacesMessage(insurancePlan)
 				&& validateInsuranceMeberRelationsWithFacesMessage(insurancePlan)
 				&& validateInsuranceCoverageOptionWithFacesMessage1(coverageOption1);
 
 		if (!silverValid) {
+			logger.info("silver plan  condition Failed");
 			return null; // Silver is mandatory
 		}
 
 		// Step 2: If Gold or Platinum is selected, validate them
+		System.out.println("=============for gold=====================");
+		logger.info("checking the condition for gold ");
+
+		logger.info("is gold : " + isGold);
+		logger.info("goldObject Validations " + validateInsuranceCoverageOptionWithFacesMessage2(coverageOption2));
+		logger.info("amount validation for gold " + validatePremiumAndCoverrageAmountOfAllCoverageOptions(
+				coverageOption1, coverageOption2, coverageOption3));
 		if (isGold && !validateInsuranceCoverageOptionWithFacesMessage2(coverageOption2)
 				&& !validatePremiumAndCoverrageAmountOfAllCoverageOptions(coverageOption1, coverageOption2,
 						coverageOption3)) {
-
-			System.out.println("ham yhi fail ho gye hai gold me");
+			logger.info("Gold condition Failed");
 			return null; // Gold selected but invalid
 		}
-
+		System.out.println("==================for platimum==================");
+		logger.info("checking the platinum conditions");
+		logger.info("is platinum : " + isPlatinum);
+		logger.info("goldObject Validations for platinum"
+				+ validateInsuranceCoverageOptionWithFacesMessage3(coverageOption3));
+		logger.info("amount validation " + validatePremiumAndCoverrageAmountOfAllCoverageOptions(coverageOption1,
+				coverageOption2, coverageOption3));
 		if (isPlatinum && !validateInsuranceCoverageOptionWithFacesMessage3(coverageOption3)
 				&& !validatePremiumAndCoverrageAmountOfAllCoverageOptions(coverageOption1, coverageOption2,
 						coverageOption3)) {
-			System.out.println("ham yhi fail ho gye hai platinium me");
+			logger.info("Platinum condition Failed");
 
 			return null; // Platinum selected but invalid
 		}
 
 		// Step 3: Save insurance plan and Silver coverage
-		insurancplanDao.addInsurancePlan(insurancePlan);
-		insuranceCoverageOptionDao.addCoveragePlan(coverageOption1);
+		try {
+			insurancplanDao.addInsurancePlan(insurancePlan);
+		} catch (InsurancePlanException e) {
+			logger.info("An error occurred while adding the insurancePlan.");
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+					"An error occurred while adding the insurancePlan."));
+
+		}
+		try {
+			insuranceCoverageOptionDao.addCoveragePlan(coverageOption1);
+		} catch (InsuranceCoverageOptionException e) {
+			logger.info("An error occurred while adding the SILVER plan.");
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+					"An error occurred while adding the SILVER plan."));
+
+		}
 
 		// Step 4: Add members
 		if (insurancePlan.getPlanType() == PlanType.INDIVIDUAL) {
+			logger.info("plan is INDIVIDUAL type ");
 			MemberPlanRule member = new MemberPlanRule();
 			member.setInsurancePlan(insurancePlan);
 			member.setRelation(Relation.INDIVIDUAL);
 			member.setGender(Gender.valueOf(individualMemberGender));
-			memberPlanRuleDao.addMember(member);
+			try {
+				memberPlanRuleDao.addMember(member);
+
+			} catch (MemberPlanException e) {
+				logger.info(" An error occurred while adding the insurance member in INDIVIDUAL type.");
+				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+						"An error occurred while adding the insurance member in INDIVIDUAL type."));
+
+			}
+			logger.info("individual member added to the plan");
 		} else {
+			logger.info("plan is FAMILY type ");
 			for (String relation : selectedRelations) {
 				MemberPlanRule member = new MemberPlanRule();
 				member.setInsurancePlan(insurancePlan);
 				member.setRelation(Relation.valueOf(relation));
 				member.setGender(relation.equals("SON1") || relation.equals("SON2") || relation.equals("FATHER")
 						|| relation.equals("HUSBAND") ? Gender.MALE : Gender.FEMALE);
-				memberPlanRuleDao.addMember(member);
+				try {
+					memberPlanRuleDao.addMember(member);
+
+				} catch (MemberPlanException e) {
+					logger.info("An error occurred while adding the insurance member in FAMILY type");
+					context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+							"An error occurred while adding the insurance member in FAMILY type"));
+
+				}
+				logger.info("family member added to the plan");
 			}
 		}
 
 		// Step 5: Add Gold and Platinum if selected and valid
 		if (isGold) {
-			insuranceCoverageOptionDao.addCoveragePlan(coverageOption2);
+			logger.info("Gold is selected");
+			try {
+				insuranceCoverageOptionDao.addCoveragePlan(coverageOption2);
+				logger.info("Gold is added");
+			} catch (InsuranceCoverageOptionException e) {
+				logger.info("An error occurred while adding the GOLD coveragePlan.");
+				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+						"An error occurred while adding the GOLD coveragePlan."));
+
+			}
 		}
 
 		if (isPlatinum) {
-			insuranceCoverageOptionDao.addCoveragePlan(coverageOption3);
+			logger.info("Platinum is selected");
+
+			try {
+				insuranceCoverageOptionDao.addCoveragePlan(coverageOption3);
+				logger.info("Platinum is added");
+
+			} catch (InsuranceCoverageOptionException e) {
+				logger.info("An error occurred while adding the PLATINUM coveragePlan.");
+				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+						"An error occurred while adding the PLATINUM coveragePlan."));
+
+			}
 		}
 
 		return "AInsuranceAdminDashBoard.jsp";
@@ -364,35 +491,58 @@ public class CreateInsuranceController {
 	 *         operation.
 	 */
 	public String findAllPlanDetailsByPlanId(String planId) {
+		logger.info(" findAllPlanDetailsByPlanId method is called ");
+		FacesContext context = FacesContext.getCurrentInstance();
 		resetAll();
 
-		insurancePlan = insurancplanDao.findInsuranceById(planId);
+		try {
+			insurancePlan = insurancplanDao.findInsuranceById(planId);
+			logger.info("insurancePlan is found with the id : " + planId);
+		} catch (InsurancePlanException e) {
+			logger.info("An error occurred while searching the insurancePlan with id : " + planId);
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+					"An error occurred while searching the insurancePlan id : " + planId));
 
-		members = memberPlanRuleDao.searchMemberByPlanId(planId);
+		}
 
-		planwithCovrageDetailsList = insuranceCoverageOptionDao.findAllInsuranceCoverageOptionsByPlanId(planId);
+		try {
+			members = memberPlanRuleDao.searchMemberByPlanId(planId);
+			logger.info("insurance member is found with the plan " + planId);
+		} catch (MemberPlanException e) {
+			logger.info("An error occurred while searching the memeber of insurancePlan id : " + planId);
 
-		System.out.println(insurancePlan);
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+					"An error occurred while searching the memeber of insurancePlan id : " + planId));
+
+		}
+
+		try {
+			planwithCovrageDetailsList = insuranceCoverageOptionDao.findAllInsuranceCoverageOptionsByPlanId(planId);
+			logger.info("coverageoptions are found with the insuranceplan id " + planId);
+		} catch (InsuranceCoverageOptionException e) {
+			logger.info("An error occurred while fetching the coverageOptions of insurancePlan id : " + planId);
+
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+					"An error occurred while fetching the coverageOptions of insurancePlan id : " + planId));
+
+		}
 
 		for (int i = 0; i < planwithCovrageDetailsList.size(); i++) {
 
 			if (planwithCovrageDetailsList.get(i).getCoverageType().equals(CoverageType.SILVER)) {
-
+				logger.info("Silver is found");
 				coverageOption1 = planwithCovrageDetailsList.get(i);
 
 			} else if (planwithCovrageDetailsList.get(i).getCoverageType().equals(CoverageType.GOLD)) {
-
+				logger.info("Gold is found");
 				coverageOption2 = planwithCovrageDetailsList.get(i);
 
 			} else if (planwithCovrageDetailsList.get(i).getCoverageType().equals(CoverageType.PLATINUM)) {
-
+				logger.info("Plantinum is found");
 				coverageOption3 = planwithCovrageDetailsList.get(i);
 			}
 
 		}
-		System.out.println(insurancePlan);
-		members.forEach(System.out::println);
-		planwithCovrageDetailsList.forEach(System.out::println);
 
 		for (MemberPlanRule member : members) {
 			String key = member.getRelation().toString();
@@ -400,6 +550,7 @@ public class CreateInsuranceController {
 			relationMap.put(key, true);
 
 		}
+		logger.info("All search is done and redirect to search page");
 		return "AInsuranceCoverageDetails";
 	}
 
@@ -413,10 +564,29 @@ public class CreateInsuranceController {
 	 *         update operation.
 	 */
 	public String updateInsurancePlan(String planId) {
+		FacesContext context = FacesContext.getCurrentInstance();
 		resetAll();
-		insurancePlan = insurancplanDao.findInsuranceById(planId);
-		members = memberPlanRuleDao.searchMemberByPlanId(planId);
-		planwithCovrageDetailsList = insuranceCoverageOptionDao.findAllInsuranceCoverageOptionsByPlanId(planId);
+		try {
+			insurancePlan = insurancplanDao.findInsuranceById(planId);
+		} catch (InsurancePlanException e) {
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+					"An error occurred while fetching the insurancePlan : " + planId));
+
+		}
+		try {
+			members = memberPlanRuleDao.searchMemberByPlanId(planId);
+		} catch (MemberPlanException e) {
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+					"An error occurred while fetching the memeber of insurancePlan  : " + planId));
+
+		}
+		try {
+			planwithCovrageDetailsList = insuranceCoverageOptionDao.findAllInsuranceCoverageOptionsByPlanId(planId);
+		} catch (InsuranceCoverageOptionException e) {
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+					"An error occurred while fetching the coverageOptions of insurancePlan  : " + planId));
+
+		}
 
 		for (int i = 0; i < planwithCovrageDetailsList.size(); i++) {
 
@@ -477,7 +647,12 @@ public class CreateInsuranceController {
 			isValid = false;
 		}
 		if (isValid) {
-			insurancplanDao.updateInsurancePlan(plan);
+			try {
+				insurancplanDao.updateInsurancePlan(plan);
+			} catch (InsurancePlanException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return "AInsuranceAdminDashBoard.jsp";
 		}
 		return null;
@@ -682,6 +857,7 @@ public class CreateInsuranceController {
 
 	@PostConstruct
 	public void init() {
+		FacesContext context = FacesContext.getCurrentInstance();
 		relationMap.put("SON1", true);
 		relationMap.put("SON2", false);
 		relationMap.put("DAUGHTER1", true);
@@ -693,11 +869,23 @@ public class CreateInsuranceController {
 		relationMap.put("SELF", false);
 		relationMap.put("INDIVIDUAL", false);
 		// dynamically update the COVERAGEPLAN STATUS : ACTIVE OR INACTIVE
-		planwithCovrageDetailsList = insuranceCoverageOptionDao.findAllInsuranceCoverageOptions();
+		try {
+			planwithCovrageDetailsList = insuranceCoverageOptionDao.findAllInsuranceCoverageOptions();
+		} catch (InsuranceCoverageOptionException e) {
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+					"An error occurred while fetching the coverageOptions of insurancePlan "));
+
+		}
 		for (InsuranceCoverageOption options : planwithCovrageDetailsList) {
 			if (isActiveBeforeOrEqualToday(options.getInsurancePlan().getActiveOn()))
 				options.setStatus(CoveragePlanStatus.ACTIVE);
-			insuranceCoverageOptionDao.updateInsuranceCoverageOption(options);
+			try {
+				insuranceCoverageOptionDao.updateInsuranceCoverageOption(options);
+			} catch (InsuranceCoverageOptionException e) {
+				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
+						"An error occurred while fetching the coverageOptions of insurancePlan  "));
+
+			}
 		}
 
 		// load InsuranceCompany
@@ -1176,50 +1364,51 @@ public class CreateInsuranceController {
 			InsuranceCoverageOption goldOption, InsuranceCoverageOption platinumOption) {
 		boolean isValid = true;
 		FacesContext context = FacesContext.getCurrentInstance();
+
 		logger.info("silver coverage amount is :" + silverOption.getCoverageAmount());
 		logger.info("golve coverage amount is " + goldOption.getCoverageAmount());
 		logger.info("platinium coverage amount is " + platinumOption.getCoverageAmount());
+		logger.info("silver PremiumAmount amount is :" + silverOption.getPremiumAmount());
+		logger.info("golve PremiumAmount amount is " + goldOption.getPremiumAmount());
+		logger.info("platinium PremiumAmount amount is " + platinumOption.getPremiumAmount());
+
+		System.out.println("=====check for silve and  gold ==========");
 		if (isSilver && silverOption != null && isGold && goldOption != null) {
-			logger.info("we are comparing silver and gold");
 			if (silverOption.getPremiumAmount() > goldOption.getPremiumAmount()) {
-				logger.info("we are comparing silver and gold : "
-						+ (silverOption.getPremiumAmount() > goldOption.getPremiumAmount()));
-				System.out.println("GoldOption PremiumAmount  must be greater than SilverOption premiumAmount");
 				context.addMessage("companyForm:PremiumAmount2", new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"GoldOption PremiumAmount  must be greater than SilverOption premiumAmount", null));
 
 				isValid = false;
+				logger.info("we are return isValid [siler and gold] in premiumAmount: " + isValid);
+
 			}
 			if (silverOption.getCoverageAmount() > goldOption.getCoverageAmount()) {
-				logger.info("we are comparing silver and gold : "
-						+ (silverOption.getCoverageAmount() > goldOption.getCoverageAmount()));
 
 				context.addMessage("companyForm:CoverageAmount2", new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"GoldOption CoverageAmount  must be greater than SilverOption CoverageAmount", null));
 				isValid = false;
+				logger.info("we are return isValid [siler and gold] in coverageAmount: " + isValid);
+
 			}
 
 		}
 		if (isGold && goldOption != null && isPlatinum && platinumOption != null) {
-			logger.info("we are comparing platinum and gold : "
-					+ (silverOption.getPremiumAmount() > goldOption.getPremiumAmount()));
+
 			if (goldOption.getPremiumAmount() > platinumOption.getPremiumAmount()) {
-				logger.info("we are comparing silver and gold : "
-						+ (goldOption.getPremiumAmount() > platinumOption.getPremiumAmount()));
-				logger.info("we are comparing silver and gold : "
-						+ (goldOption.getPremiumAmount() > platinumOption.getPremiumAmount()));
 
 				context.addMessage("companyForm:PremiumAmount3", new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"platinumOption PremiumAmount  must be greater than goldOption premiumAmount", null));
 				isValid = false;
+				logger.info("we are return isValid [platinumOption and gold] in premiumAmount: " + isValid);
+
 			}
 			if (goldOption.getCoverageAmount() > platinumOption.getCoverageAmount()) {
-				logger.info("we are comparing silver and gold : "
-						+ (goldOption.getCoverageAmount() > platinumOption.getCoverageAmount()));
 
 				context.addMessage("companyForm:CoverageAmount3", new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"platinumOption CoverageAmount  must be greater than goldOption CoverageAmount", null));
 				isValid = false;
+				logger.info("we are return isValid [platinumOption and gold] in coverageAmount: " + isValid);
+
 			}
 
 		}
@@ -1230,24 +1419,31 @@ public class CreateInsuranceController {
 				context.addMessage("companyForm:PremiumAmount3", new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"platinumOption PremiumAmount  must be greater than SilverOption premiumAmount", null));
 				isValid = false;
+				logger.info("we are return isValid [platinumOption and silverOption] in coverageAmount: " + isValid);
+
 			}
 			if (silverOption.getCoverageAmount() > platinumOption.getCoverageAmount()) {
 				context.addMessage("companyForm:CoverageAmount3", new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"platinumOption CoverageAmount  must be greater than SilverOption CoverageAmount", null));
 				isValid = false;
+				logger.info("we are return isValid [platinumOption and silverOption] in coverageAmount: " + isValid);
+
 			}
 
 		}
+
 		return isValid;
 
 	}
 
 	public void resetAll() {
+
 		insurancePlan = new InsurancePlan();
 		coverageOption1 = new InsuranceCoverageOption();
 		coverageOption2 = new InsuranceCoverageOption();
 		coverageOption3 = new InsuranceCoverageOption();
 		insurancePlan.setInsuranceCompany(insuranceCompany);
+		logger.debug("resetAll is Done ");
 	}
 
 }
