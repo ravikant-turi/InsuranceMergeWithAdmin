@@ -21,7 +21,7 @@
 				class="nav-link">Review Pharmacy</a></li>
 
 			<li><a
-				href="/HealthSureClient/admin/AInsuranceAdminDashBoard.jsf"
+				href="/HealthSureClient/admin/insuranceAdminDashBoard.jsf"
 				class="nav-link">Insurance</a></li>
 			<!--   
 						<li><a href="appointments.jsf" class="nav-link">Provider</a></li>

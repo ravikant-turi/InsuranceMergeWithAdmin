@@ -20,10 +20,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+
 import org.apache.log4j.Logger;
+
 import com.infinite.jsf.insurance.dao.InsuranceCompanyDao;
 import com.infinite.jsf.insurance.dao.InsuranceCoverageOptionDao;
 import com.infinite.jsf.insurance.dao.InsurancePlanDao;
@@ -37,12 +41,12 @@ import com.infinite.jsf.insurance.exception.InsurancePlanException;
 import com.infinite.jsf.insurance.exception.MemberPlanException;
 import com.infinite.jsf.insurance.model.CoveragePlanStatus;
 import com.infinite.jsf.insurance.model.CoverageType;
+import com.infinite.jsf.insurance.model.CreateInsuranceMessageConstants;
 import com.infinite.jsf.insurance.model.Gender;
 import com.infinite.jsf.insurance.model.InsuranceCompany;
 import com.infinite.jsf.insurance.model.InsuranceCoverageOption;
 import com.infinite.jsf.insurance.model.InsurancePlan;
 import com.infinite.jsf.insurance.model.MemberPlanRule;
-import com.infinite.jsf.insurance.model.CreateInsuranceMessageConstants;
 import com.infinite.jsf.insurance.model.PlanType;
 import com.infinite.jsf.insurance.model.Relation;
 
@@ -90,10 +94,74 @@ public class CreateInsuranceController {
 	private boolean sortAscending = true;
 
 	public List<InsurancePlan> getPaginatedPlans() {
-		planList = showAllPlan(); // Load once
+		showAllPlan();
+		applySorting(); // Ensure sorting is applied before pagination
 		int start = currentPage * pageSize;
 		int end = Math.min(start + pageSize, planList.size());
 		return planList.subList(start, end);
+	}
+
+	public void sortBy(String field) {
+		if (field.equals(sortField)) {
+			sortAscending = !sortAscending;
+		} else {
+			sortField = field;
+			sortAscending = true;
+		}
+		applySorting();
+	}
+
+	public void sortByAsc(String field) {
+		sortField = field;
+		sortAscending = true;
+		applySorting();
+	}
+
+	public void sortByDesc(String field) {
+		sortField = field;
+		sortAscending = false;
+		applySorting();
+	}
+
+	private void applySorting() {
+		if (planList == null || planList.isEmpty())
+			return;
+
+		Comparator<InsurancePlan> comparator = getComparator(sortField);
+		if (comparator == null)
+			return;
+
+		if (!sortAscending) {
+			comparator = comparator.reversed();
+		}
+		planList.sort(comparator);
+	}
+
+	private Comparator<InsurancePlan> getComparator(String field) {
+		switch (field) {
+		case "planName":
+			return Comparator.comparing(InsurancePlan::getPlanName, Comparator.nullsLast(String::compareTo));
+		case "planType":
+			return Comparator.comparing(InsurancePlan::getPlanType, Comparator.nullsLast(Enum::compareTo));
+		case "waitingPeriod":
+			return Comparator.comparing(InsurancePlan::getWaitingPeriod, Comparator.nullsLast(Integer::compareTo));
+		case "expireDate":
+			return Comparator.comparing(InsurancePlan::getExpireDate, Comparator.nullsLast(Date::compareTo));
+		case "activeOn":
+			return Comparator.comparing(InsurancePlan::getActiveOn, Comparator.nullsLast(Date::compareTo));
+		case "maximumMemberAllowed":
+			return Comparator.comparing(InsurancePlan::getMaximumMemberAllowed,
+					Comparator.nullsLast(Integer::compareTo));
+		case "availableCoverAmounts":
+			return Comparator.comparing(InsurancePlan::getAvailableCoverAmounts,
+					Comparator.nullsLast(Double::compareTo));
+		case "periodicDiseases":
+			return Comparator.comparing(InsurancePlan::getPeriodicDiseases, Comparator.nullsLast(String::compareTo));
+		case "description":
+			return Comparator.comparing(InsurancePlan::getDescription, Comparator.nullsLast(String::compareTo));
+		default: // planId
+			return Comparator.comparing(InsurancePlan::getPlanId, Comparator.nullsLast(String::compareTo));
+		}
 	}
 
 	public void nextPage() {
@@ -128,48 +196,6 @@ public class CreateInsuranceController {
 		return pageSize;
 	}
 
-	public void sortBy(String field) {
-		if (sortField.equals(field)) {
-			sortAscending = !sortAscending;
-		} else {
-			sortField = field;
-			sortAscending = true;
-		}
-
-		Comparator<InsurancePlan> comparator = null;
-
-		switch (field) {
-		case "planName": // Integer
-			comparator = Comparator.comparing(InsurancePlan::getPlanName);
-			break;
-		case "planType": // Enum
-			comparator = Comparator.comparing(InsurancePlan::getPlanType);
-			break;
-		case "waitingPeriod": // Integer
-			comparator = Comparator.comparing(InsurancePlan::getWaitingPeriod);
-			break;
-		case "expireDate": // Date
-			comparator = Comparator.comparing(InsurancePlan::getExpireDate);
-			break;
-		case "activeOn": // Date
-			comparator = Comparator.comparing(InsurancePlan::getActiveOn);
-			break;
-		case "maximumMemberAllowed": // Integer
-			comparator = Comparator.comparing(InsurancePlan::getMaximumMemberAllowed);
-			break;
-		default: // planId (Integer)
-			comparator = Comparator.comparing(InsurancePlan::getPlanId);
-			break;
-		}
-
-		if (comparator != null) {
-			if (!sortAscending) {
-				comparator = comparator.reversed();
-			}
-			planList.sort(comparator);
-		}
-	}
-
 	// ==========================
 	/**
 	 * Retrieves and returns a list of all available insurance plans to be displayed
@@ -193,7 +219,18 @@ public class CreateInsuranceController {
 
 	public String navigateToAddInsurance() {
 		resetAll();
-		return "AInsuranceAddInsuranceCoveragePlan";
+		System.err.println("navigate : insuranceAddInsuranceCoveragePlan");
+		return "insuranceAddInsuranceCoveragePlan?faces:redirect=true";
+
+//		FacesContext facesContext = FacesContext.getCurrentInstance();
+//		ExternalContext externalContext = facesContext.getExternalContext();
+//
+//		try {
+//			externalContext.redirect("insuranceAddInsuranceCoveragePlan.jsp");
+//		} catch (IOException e) {
+//			logger.error("not redirecting : insuranceAddInsuranceCoveragePlan ");
+//		} 
+
 	}
 
 	/**
@@ -204,122 +241,6 @@ public class CreateInsuranceController {
 	 *
 	 * @return Navigation outcome or status string indicating success or failure.
 	 */
-	public String addSilverOnlyMendatorytemp() {
-		FacesContext context = FacesContext.getCurrentInstance();
-
-		System.out.println(insurancePlan + " null : " + insurancePlan == null);
-		System.out.println(coverageOption1 + " null : " + coverageOption1 == null);
-		System.out.println(coverageOption2 + " null : " + coverageOption2 == null);
-		System.out.println(coverageOption3 + " null : " + coverageOption3 == null);
-
-		insurancePlan.setInsuranceCompany(insuranceCompany);
-		if (insurancePlan.getActiveOn() != null) {
-			insurancePlan.setExpireDate(calculateExpiryDate(insurancePlan.getActiveOn(), yearsToAdd));
-
-		}
-		insurancePlan.setCreatedOn(new Date());
-		coverageOption1.setInsurancePlan(insurancePlan);
-		coverageOption2.setInsurancePlan(insurancePlan);
-		coverageOption3.setInsurancePlan(insurancePlan);
-
-		if (isSilver && validateInsurancePlanWithFacesMessage(insurancePlan)
-				|| (validateInsuranceCoverageOptionWithFacesMessage1(coverageOption1))
-				|| ((insurancePlan.getPlanType() != null
-						&& validateInsuranceMeberRelationsWithFacesMessage(insurancePlan))
-						|| (isGold && validateInsuranceCoverageOptionWithFacesMessage2(coverageOption2))
-						|| (isPlatinum && validateInsuranceCoverageOptionWithFacesMessage3(coverageOption3)))
-
-				|| validatePremiumAndCoverrageAmountOfAllCoverageOptions(coverageOption1, coverageOption2,
-						coverageOption3)) {
-
-			// silver(coverage1) is mandatory
-			if (isSilver && validateInsurancePlanWithFacesMessage(insurancePlan)
-					&& validateInsuranceCoverageOptionWithFacesMessage1(coverageOption1)
-					&& validateInsuranceMeberRelationsWithFacesMessage(insurancePlan)
-					&& validateInsuranceMeberRelationsWithFacesMessage(insurancePlan)) {
-				try {
-					insurancplanDao.addInsurancePlan(insurancePlan);
-				} catch (InsurancePlanException e) {
-					context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
-							"An error occurred while adding the insurancePlan."));
-				}
-				coverageOption1.setInsurancePlan(insurancePlan);
-				try {
-					insuranceCoverageOptionDao.addCoveragePlan(coverageOption1);
-				} catch (InsuranceCoverageOptionException e) {
-					context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
-							"An error occurred while adding the coveragePlan."));
-
-				}
-				if (insurancePlan.getPlanType() == PlanType.INDIVIDUAL) {
-					logger.info("we are inside individual type to make member object");
-					MemberPlanRule member = new MemberPlanRule();
-					member.setInsurancePlan(insurancePlan);
-					member.setRelation(Relation.INDIVIDUAL);
-					member.setGender(Gender.valueOf(individualMemberGender));
-					try {
-						memberPlanRuleDao.addMember(member);
-					} catch (MemberPlanException e) {
-						context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
-								"An error occurred while adding the insurance member in INDIVIDUAL type."));
-
-					}
-
-				} // family type
-				else {
-					for (String relations : selectedRelations) {
-						MemberPlanRule member = new MemberPlanRule();
-						member.setInsurancePlan(insurancePlan);
-						member.setRelation(Relation.valueOf(relations));
-						if (relations == "SON1" || relations == "SON2" || relations == "FATHER"
-								|| relations == "HUSBAND") {
-							member.setGender(Gender.MALE);
-						} else {
-							member.setGender(Gender.FEMALE);
-						}
-						try {
-							memberPlanRuleDao.addMember(member);
-						} catch (MemberPlanException e) {
-							context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
-									"An error occurred while adding the insurance member in FAMILY type"));
-
-						}
-					}
-				}
-
-				if (isSilver && isGold && validateInsurancePlanWithFacesMessage(insurancePlan)
-						&& validateInsuranceMeberRelationsWithFacesMessage(insurancePlan)
-						&& validateInsuranceCoverageOptionWithFacesMessage2(coverageOption2)) {
-					coverageOption3.setInsurancePlan(insurancePlan);
-					try {
-						insuranceCoverageOptionDao.addCoveragePlan(coverageOption2);
-					} catch (InsuranceCoverageOptionException e) {
-						context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
-								"An error occurred while adding the coveragePlan."));
-
-					}
-				}
-				if (isSilver && isPlatinum && validateInsurancePlanWithFacesMessage(insurancePlan)
-						&& validateInsuranceMeberRelationsWithFacesMessage(insurancePlan)
-						&& validateInsuranceCoverageOptionWithFacesMessage3(coverageOption3)) {
-					coverageOption3.setInsurancePlan(insurancePlan);
-					try {
-						insuranceCoverageOptionDao.addCoveragePlan(coverageOption3);
-					} catch (InsuranceCoverageOptionException e) {
-						context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
-								"An error occurred while adding the coveragePlan."));
-
-					}
-				}
-
-				return "AInsuranceAdminDashBoard.jsp";
-			}
-
-		}
-
-		return null;
-
-	}
 
 	public String addSilverOnlyMendatory() {
 
@@ -478,7 +399,7 @@ public class CreateInsuranceController {
 			}
 		}
 
-		return "AInsuranceAdminDashBoard.jsp";
+		return "insuranceAdminDashBoard";
 	}
 
 	/**
@@ -491,9 +412,10 @@ public class CreateInsuranceController {
 	 *         operation.
 	 */
 	public String findAllPlanDetailsByPlanId(String planId) {
+		System.err.println("we are searching with id " + planId);
 		logger.info(" findAllPlanDetailsByPlanId method is called ");
-		FacesContext context = FacesContext.getCurrentInstance();
 		resetAll();
+		FacesContext context = FacesContext.getCurrentInstance();
 
 		try {
 			insurancePlan = insurancplanDao.findInsuranceById(planId);
@@ -550,8 +472,8 @@ public class CreateInsuranceController {
 			relationMap.put(key, true);
 
 		}
-		logger.info("All search is done and redirect to search page");
-		return "AInsuranceCoverageDetails";
+		logger.info("All search is done and redirect to search page : insuranceCoverageDetails");
+		return "insuranceCoverageDetails?faces:redirect=true";
 	}
 
 	/**
@@ -565,6 +487,7 @@ public class CreateInsuranceController {
 	 */
 	public String updateInsurancePlan(String planId) {
 		FacesContext context = FacesContext.getCurrentInstance();
+		System.err.println("We are calling update method");
 		resetAll();
 		try {
 			insurancePlan = insurancplanDao.findInsuranceById(planId);
@@ -610,7 +533,7 @@ public class CreateInsuranceController {
 			relationMap.put(key, true);
 
 		}
-		return "AInsuranceUpdate";
+		return "insuranceUpdate?faces:redirect=true";
 	}
 
 	/**
@@ -653,7 +576,7 @@ public class CreateInsuranceController {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			return "AInsuranceAdminDashBoard.jsp";
+			return "insuranceAdminDashBoard?faces:redirect=true";
 		}
 		return null;
 
@@ -1040,7 +963,7 @@ public class CreateInsuranceController {
 		}
 		// 7.minimum memberAllowed
 		if (plan.getMinimumMeberAllowed() == 0) {
-			context.addMessage("companyForm:minimumMeberAllowed",
+			context.addMessage("companyForm:minimumMemberAllowed",
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.MIN_MEMBER_REQUIRED, null));
 			logger.info(validationMessages.MIN_MEMBER_REQUIRED);
 			isValid = false;
@@ -1087,7 +1010,7 @@ public class CreateInsuranceController {
 
 		int waitingPeriod = plan.getWaitingPeriod();
 
-		if (waitingPeriod < 0 || waitingPeriod > 12) {
+		if (waitingPeriod <= 0 || waitingPeriod > 12) {
 			context.addMessage("companyForm:waitingPeriod", new FacesMessage(FacesMessage.SEVERITY_ERROR,
 					validationMessages.WAITING_PERIOD_OUT_OF_RANGE, null));
 			logger.info("Waiting period must be between 0 and 12 months.");
@@ -1374,7 +1297,6 @@ public class CreateInsuranceController {
 
 		System.out.println("=====check for silve and  gold ==========");
 
-		
 		if (isSilver && silverOption != null && isGold && goldOption != null) {
 			if (silverOption.getPremiumAmount() > goldOption.getPremiumAmount()) {
 				context.addMessage("companyForm:PremiumAmount2", new FacesMessage(FacesMessage.SEVERITY_ERROR,

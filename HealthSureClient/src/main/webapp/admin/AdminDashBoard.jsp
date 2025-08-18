@@ -43,7 +43,7 @@
 				</h:form>
 				<h:form>
 					<h:commandButton value="📃 Create Insurance Plan"
-						action="/Insurance/AInsuranceAdminDashBoard.jsp"
+						action="insuranceAdminDashBoard"
 						styleClass="w-full py-3 px-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium shadow transition" />
 				</h:form>
 
