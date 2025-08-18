@@ -21,7 +21,6 @@ import org.hibernate.exception.SQLGrammarException;
 
 import com.infinite.jsf.admin.dao.ReviewPharmacyaDao;
 import com.infinite.jsf.admin.exception.ReviewPharmacyException;
-import com.infinite.jsf.insurance.exception.InsurancePlanException;
 import com.infinite.jsf.pharmacy.model.Pharmacy;
 import com.infinite.jsf.util.MailSend;
 import com.infinite.jsf.util.SessionHelper;
@@ -154,7 +153,7 @@ public class ReviewPharmacyaDaoImpl implements ReviewPharmacyaDao {
 
 			String email = pharmacy.getEmail();
 			MailSend.sendInfo(email, "PHARMACY STATUS : ACCETPED",
-					"\n Congratulations !!  Your pharmacy s has been ACCPTED \n\n ADMIN : \n RAVIKANT TURI");
+					"\n Congratulations !! \n Your pharmacy  has been ACCPTED \n\n ADMIN : \n RAVIKANT TURI");
 
 			trans.commit();
 
@@ -164,11 +163,6 @@ public class ReviewPharmacyaDaoImpl implements ReviewPharmacyaDao {
 
 			return "updated";
 
-		} catch (JDBCConnectionException e) {
-			if (trans != null)
-				trans.rollback();
-			logger.error("Database connection failed", e);
-			throw new ReviewPharmacyException("Database connection error  while fetching all Pharamcy", e);
 		} catch (SQLGrammarException e) {
 			if (trans != null)
 				trans.rollback();

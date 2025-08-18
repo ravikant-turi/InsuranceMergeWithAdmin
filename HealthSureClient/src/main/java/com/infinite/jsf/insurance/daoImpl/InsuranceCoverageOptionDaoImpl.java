@@ -62,18 +62,6 @@ public class InsuranceCoverageOptionDaoImpl implements InsuranceCoverageOptionDa
 			logger.info("Coverage option saved successfully with ID: " + coverageId);
 			return "success";
 
-		} catch (JDBCConnectionException e) {
-			if (trans != null)
-				trans.rollback();
-			logger.error("Database connection error while saving coverage option", e);
-			throw new InsuranceCoverageOptionException("Database connection error", e);
-
-		} catch (SQLGrammarException e) {
-			if (trans != null)
-				trans.rollback();
-			logger.error("SQL syntax error while saving coverage option", e);
-			throw new InsuranceCoverageOptionException("SQL syntax error", e);
-
 		} catch (ConstraintViolationException e) {
 			if (trans != null)
 				trans.rollback();
@@ -114,18 +102,6 @@ public class InsuranceCoverageOptionDaoImpl implements InsuranceCoverageOptionDa
 					.createQuery("SELECT c.coverageId FROM InsuranceCoverageOption c ORDER BY c.coverageId DESC")
 					.setMaxResults(1).uniqueResult();
 			logger.debug("Last coverage ID fetched: " + lastId);
-
-		} catch (JDBCConnectionException e) {
-			logger.error("Database connection error while fetching last coverage ID", e);
-			throw new InsuranceCoverageOptionException("Database connection error", e);
-
-		} catch (SQLGrammarException e) {
-			logger.error("SQL syntax error while fetching last coverage ID", e);
-			throw new InsuranceCoverageOptionException("SQL syntax error", e);
-
-		} catch (QueryTimeoutException e) {
-			logger.error("Query timed out while fetching last coverage ID", e);
-			throw new InsuranceCoverageOptionException("Query timeout", e);
 
 		} catch (HibernateException e) {
 			logger.error("Hibernate error while fetching last coverage ID", e);
@@ -187,14 +163,6 @@ public class InsuranceCoverageOptionDaoImpl implements InsuranceCoverageOptionDa
 			coverageOptionsList = query.list();
 			trans.commit();
 			logger.info("Fetched coverage options for plan ID: " + planId);
-		} catch (JDBCConnectionException e) {
-			logger.error("Database connection error while fetching last coverage ID", e);
-			throw new InsuranceCoverageOptionException("Database connection error", e);
-
-		} catch (SQLGrammarException e) {
-			if (trans != null)
-				trans.rollback();
-			logger.error("SQL grammar error", e);
 		} catch (HibernateException e) {
 			logger.error("Hibernate error while fetching last coverage ID", e);
 			throw new InsuranceCoverageOptionException("Hibernate error", e);
@@ -232,44 +200,39 @@ public class InsuranceCoverageOptionDaoImpl implements InsuranceCoverageOptionDa
 	 */
 	@Override
 	public String updateInsuranceCoverageOption(InsuranceCoverageOption coverageOption)
-	        throws InsuranceCoverageOptionException {
-	    Session session = null;
-	    Transaction trans = null;
+			throws InsuranceCoverageOptionException {
+		Session session = null;
+		Transaction trans = null;
 
-	    try {
-	        session = factory.openSession();
-	        trans = session.beginTransaction();
-	        session.update(coverageOption);
-	        trans.commit();
-	        logger.info("Coverage option updated successfully for ID: " + coverageOption.getCoverageId());
-	        return "updated";
-	    } catch (IllegalArgumentException e) {
-	        if (trans != null) trans.rollback();
-	        logger.error("Update failed: The provided InsuranceCoverageOption object is null or invalid.", e);
-	        throw new InsuranceCoverageOptionException("Invalid input", e);
-	    } catch (NonUniqueObjectException e) {
-	        if (trans != null) trans.rollback();
-	        logger.error("Update failed: Another object with the same identifier is already associated with the session.", e);
-	        throw new InsuranceCoverageOptionException("Duplicate object in session", e);
-	    } catch (StaleObjectStateException e) {
-	        if (trans != null) trans.rollback();
-	        logger.error("Update failed: The object was modified or deleted by another transaction (stale state).", e);
-	        throw new InsuranceCoverageOptionException("Stale object state", e);
-	    } catch (HibernateException e) {
-	        if (trans != null) trans.rollback();
-	        logger.error("Update failed: A general Hibernate error occurred. Check database connectivity and mappings.", e);
-	        throw new InsuranceCoverageOptionException("Hibernate error", e);
-	    } catch (Exception e) {
-	        if (trans != null) trans.rollback();
-	        logger.error("Update failed: An unexpected error occurred while updating the coverage option.", e);
-	        throw new InsuranceCoverageOptionException("Unexpected error", e);
-	    } finally {
-	        if (session != null) session.close();
-	    }
+		try {
+			session = factory.openSession();
+			trans = session.beginTransaction();
+			session.update(coverageOption);
+			trans.commit();
+			logger.info("Coverage option updated successfully for ID: " + coverageOption.getCoverageId());
+			return "updated";
+		} catch (IllegalArgumentException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Update failed: The provided InsuranceCoverageOption object is null or invalid.", e);
+			throw new InsuranceCoverageOptionException("Invalid input", e);
+		} catch (HibernateException e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Update failed: A general Hibernate error occurred. Check database connectivity and mappings.",
+					e);
+			throw new InsuranceCoverageOptionException("Hibernate error", e);
+		} catch (Exception e) {
+			if (trans != null)
+				trans.rollback();
+			logger.error("Update failed: An unexpected error occurred while updating the coverage option.", e);
+			throw new InsuranceCoverageOptionException("Unexpected error", e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
 	}
 
-
-	
 	@Override
 	public List<InsuranceCoverageOption> findAllInsuranceCoverageOptions() throws InsuranceCoverageOptionException {
 		List<InsuranceCoverageOption> options = null;
@@ -281,16 +244,6 @@ public class InsuranceCoverageOptionDaoImpl implements InsuranceCoverageOptionDa
 			trans = session.beginTransaction();
 			options = session.createQuery("from InsuranceCoverageOption").list();
 			trans.commit();
-		} catch (JDBCConnectionException e) {
-			if (trans != null)
-				trans.rollback();
-			logger.error("Database connection failed while fetching coverage options", e);
-			throw new InsuranceCoverageOptionException("Database connection error", e);
-		} catch (SQLGrammarException e) {
-			if (trans != null)
-				trans.rollback();
-			logger.error("SQL syntax error while fetching coverage options", e);
-			throw new InsuranceCoverageOptionException("SQL syntax error", e);
 		} catch (HibernateException e) {
 			if (trans != null)
 				trans.rollback();

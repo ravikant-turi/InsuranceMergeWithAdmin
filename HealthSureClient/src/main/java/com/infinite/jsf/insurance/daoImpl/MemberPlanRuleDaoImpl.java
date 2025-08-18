@@ -57,24 +57,6 @@ public class MemberPlanRuleDaoImpl implements MemberPlanRuleDao {
 			logger.info("Member saved successfully with ID: " + memberId);
 			return "success";
 
-		} catch (JDBCConnectionException e) {
-			if (trans != null)
-				trans.rollback();
-			logger.error("Database connection error while saving member", e);
-			throw new MemberPlanException("Database connection error", e);
-
-		} catch (SQLGrammarException e) {
-			if (trans != null)
-				trans.rollback();
-			logger.error("SQL syntax error while saving member", e);
-			throw new MemberPlanException("SQL syntax error", e);
-
-		} catch (ConstraintViolationException e) {
-			if (trans != null)
-				trans.rollback();
-			logger.error("Constraint violation while saving member", e);
-			throw new MemberPlanException("Constraint violation", e);
-
 		} catch (HibernateException e) {
 			if (trans != null)
 				trans.rollback();
@@ -108,18 +90,6 @@ public class MemberPlanRuleDaoImpl implements MemberPlanRuleDao {
 			lastId = (String) session.createQuery("SELECT m.meberId FROM MemberPlanRule m ORDER BY m.meberId DESC")
 					.setMaxResults(1).uniqueResult();
 			logger.debug("Last member ID fetched: " + lastId);
-
-		} catch (JDBCConnectionException e) {
-			logger.error("Database connection error while fetching last member ID", e);
-			throw new MemberPlanException("Database connection error", e);
-
-		} catch (SQLGrammarException e) {
-			logger.error("SQL syntax error while fetching last member ID", e);
-			throw new MemberPlanException("SQL syntax error", e);
-
-		} catch (QueryTimeoutException e) {
-			logger.error("Query timed out while fetching last member ID", e);
-			throw new MemberPlanException("Query timeout", e);
 
 		} catch (HibernateException e) {
 			logger.error("Hibernate error while fetching last member ID", e);
@@ -176,24 +146,6 @@ public class MemberPlanRuleDaoImpl implements MemberPlanRuleDao {
 
 			trans.commit();
 			logger.info("Members retrieved for plan ID: " + planId);
-
-		} catch (JDBCConnectionException e) {
-			if (trans != null)
-				trans.rollback();
-			logger.error("Database connection error while retrieving members", e);
-			throw new MemberPlanException("Database connection error", e);
-
-		} catch (SQLGrammarException e) {
-			if (trans != null)
-				trans.rollback();
-			logger.error("SQL syntax error while retrieving members", e);
-			throw new MemberPlanException("SQL syntax error", e);
-
-		} catch (QueryTimeoutException e) {
-			if (trans != null)
-				trans.rollback();
-			logger.error("Query timed out while retrieving members", e);
-			throw new MemberPlanException("Query timeout", e);
 
 		} catch (HibernateException e) {
 			if (trans != null)

@@ -27,170 +27,171 @@
 			<div class="card-header">Add Insurance Plan</div>
 			<div class="card-body">
 				<h:form id="companyForm">
-					<h3 class="sub-heading">Insurance Plan Details</h3>
-					<div class="form-grid">
-						<!-- Company Info -->
-						<div class="form-group">
-							<label for="companyId">Company Name</label>
-							<h:inputText id="companyId" styleClass="form-control"
-								readonly="true" title="Can't change"
-								value="#{createInsuranceController.insurancePlan.insuranceCompany.name}" />
-							<br />
-							<h:message for="companyId" styleClass="error-message" />
-						</div>
+					<div class="plan-details">
+						<h3 class="sub-heading">Insurance Plan Details</h3>
+						<div class="form-grid">
+							<!-- Company Info -->
+							<div class="form-group">
+								<label for="companyId">Company Name</label>
+								<h:inputText id="companyId" styleClass="form-control"
+									readonly="true" title="Can't change"
+									value="#{createInsuranceController.insurancePlan.insuranceCompany.name}" />
+								<br />
+								<h:message for="companyId" styleClass="error-message" />
+							</div>
 
-						<div class="form-group">
-							<label for="planName" class="required-field">Plan Name</label>
-							<h:inputText id="planName" styleClass="form-control"
-								value="#{createInsuranceController.insurancePlan.planName}" />
-							<br />
-							<h:message for="planName" styleClass="error-message" />
-						</div>
+							<div class="form-group">
+								<label for="planName" class="required-field">Plan Name</label>
+								<h:inputText id="planName" styleClass="form-control"
+									value="#{createInsuranceController.insurancePlan.planName}" />
+								<br />
+								<h:message for="planName" styleClass="error-message" />
+							</div>
 
-						<div class="form-group">
-							<label for="planType" class="required-field">Plan Type</label>
-							<h:selectOneMenu id="planType" styleClass="form-control"
-								onchange="selectOneMenu();"
-								value="#{createInsuranceController.insurancePlan.planType}">
-								<f:selectItem itemLabel="--Select--" itemValue="" />
-								<f:selectItem itemLabel="INDIVIDUAL" itemValue="INDIVIDUAL" />
-								<f:selectItem itemLabel="FAMILY" itemValue="FAMILY" />
-							</h:selectOneMenu>
-							<br />
+							<div class="form-group">
+								<label for="planType" class="required-field">Plan Type</label>
+								<h:selectOneMenu id="planType" styleClass="form-control"
+									onchange="selectOneMenu();"
+									value="#{createInsuranceController.insurancePlan.planType}">
+									<f:selectItem itemLabel="--Select--" itemValue="" />
+									<f:selectItem itemLabel="INDIVIDUAL" itemValue="INDIVIDUAL" />
+									<f:selectItem itemLabel="FAMILY" itemValue="FAMILY" />
+								</h:selectOneMenu>
+								<br />
 
-							<h:message for="planType" styleClass="error-message" />
-						</div>
+								<h:message for="planType" styleClass="error-message" />
+							</div>
 
-						<!-- Age Limits -->
-						<div class="form-group">
-							<label for="maxAge" class="required-field">Max Age</label>
-							<h:inputText id="maxAge" styleClass="form-control"
-								value="#{createInsuranceController.insurancePlan.maxEntryAge}">
-								<f:convertNumber type="number" />
-							</h:inputText>
-							<h:message for="maxAge" styleClass="error-message" />
-						</div>
+							<!-- Age Limits -->
+							<div class="form-group">
+								<label for="maxAge" class="required-field">Max Age</label>
+								<h:inputText id="maxAge" styleClass="form-control"
+									value="#{createInsuranceController.insurancePlan.maxEntryAge}">
+									<f:convertNumber type="number" />
+								</h:inputText>
+								<h:message for="maxAge" styleClass="error-message" />
+							</div>
 
-						<div class="form-group">
-							<label for="minAge" class="required-field">Min Age</label>
-							<h:inputText id="minAge" styleClass="form-control"
-								value="#{createInsuranceController.insurancePlan.minEntryAge}">
-								<f:convertNumber type="number" />
-							</h:inputText>
-							<br /> <br />
-							<h:message for="minAge" styleClass="error-message" />
-						</div>
+							<div class="form-group">
+								<label for="minAge" class="required-field">Min Age</label>
+								<h:inputText id="minAge" styleClass="form-control"
+									value="#{createInsuranceController.insurancePlan.minEntryAge}">
+									<f:convertNumber type="number" />
+								</h:inputText>
+								<br /> <br />
+								<h:message for="minAge" styleClass="error-message" />
+							</div>
 
-						<div class="form-group">
-							<label for="periodicDiseases" class="required-field">Periodic
-								Diseases</label>
-							<h:selectOneMenu id="periodicDiseases" styleClass="form-control"
-								value="#{createInsuranceController.insurancePlan.periodicDiseases}">
-								<f:selectItem itemLabel="--Select--" itemValue="" />
-								<f:selectItem itemLabel="YES" itemValue="YES" />
-								<f:selectItem itemLabel="NO" itemValue="NO" />
-							</h:selectOneMenu>
-							<br />
-							<h:message for="periodicDiseases" styleClass="error-message" />
-						</div>
+							<div class="form-group">
+								<label for="periodicDiseases" class="required-field">Periodic
+									Diseases</label>
+								<h:selectOneMenu id="periodicDiseases" styleClass="form-control"
+									value="#{createInsuranceController.insurancePlan.periodicDiseases}">
+									<f:selectItem itemLabel="--Select--" itemValue="" />
+									<f:selectItem itemLabel="YES" itemValue="YES" />
+									<f:selectItem itemLabel="NO" itemValue="NO" />
+								</h:selectOneMenu>
+								<br />
+								<h:message for="periodicDiseases" styleClass="error-message" />
+							</div>
 
-						<!-- Financial Details -->
-						<div class="form-group">
-							<label for="cover" class="required-field">Available
-								Amount</label>
-							<h:inputText id="cover" styleClass="form-control"
-								value="#{createInsuranceController.insurancePlan.availableCoverAmounts}">
-								<f:convertNumber type="number" />
-							</h:inputText>
-							<br />
-							<h:message for="cover" styleClass="error-message" />
-						</div>
+							<!-- Financial Details -->
+							<div class="form-group">
+								<label for="cover" class="required-field">Available
+									Amount</label>
+								<h:inputText id="cover" styleClass="form-control"
+									value="#{createInsuranceController.insurancePlan.availableCoverAmounts}">
+									<f:convertNumber pattern="0.00" />
+								</h:inputText>
+								<br />
+								<h:message for="cover" styleClass="error-message" />
+							</div>
 
-						<div class="form-group">
-							<label for="waitingPeriod" class="required-field">Waiting
-								Period (Month)</label>
-							<h:selectOneMenu id="waitingPeriod" styleClass="form-control"
-								value="#{createInsuranceController.insurancePlan.waitingPeriod}">
-								<f:selectItem itemLabel="-- Select --" itemValue="" />
-								<f:selectItem itemLabel="1 Month" itemValue="1" />
-								<f:selectItem itemLabel="2 Months" itemValue="2" />
-								<f:selectItem itemLabel="3 Months" itemValue="3" />
-							</h:selectOneMenu>
-							<br />
-							<h:message for="waitingPeriod" styleClass="error-message" />
-						</div>
+							<div class="form-group">
+								<label for="waitingPeriod" class="required-field">Waiting
+									Period (Month)</label>
+								<h:selectOneMenu id="waitingPeriod" styleClass="form-control"
+									value="#{createInsuranceController.insurancePlan.waitingPeriod}">
+									<f:selectItem itemLabel="-- Select --" itemValue="" />
+									<f:selectItem itemLabel="1 Month" itemValue="1" />
+									<f:selectItem itemLabel="2 Months" itemValue="2" />
+									<f:selectItem itemLabel="3 Months" itemValue="3" />
+								</h:selectOneMenu>
+								<br />
+								<h:message for="waitingPeriod" styleClass="error-message" />
+							</div>
 
-						<div class="form-group">
-							<label for="yearsToAdd" class="required-field">Duration</label>
-							<h:selectOneMenu id="yearsToAdd" styleClass="form-control"
-								value="#{createInsuranceController.yearsToAdd}">
-								<f:selectItem itemLabel="--Select--" itemValue="" />
-								<f:selectItem itemLabel="1 Year" itemValue="1" />
-								<f:selectItem itemLabel="2 Years" itemValue="2" />
-								<f:selectItem itemLabel="3 Years" itemValue="3" />
-								<f:selectItem itemLabel="5 Years" itemValue="5" />
-								<f:selectItem itemLabel="10 Years" itemValue="10" />
-								<f:selectItem itemLabel="12 Years" itemValue="12" />
-							</h:selectOneMenu>
-							<br />
-							<h:message for="yearsToAdd" styleClass="error-message" />
-						</div>
+							<div class="form-group">
+								<label for="yearsToAdd" class="required-field">Duration</label>
+								<h:selectOneMenu id="yearsToAdd" styleClass="form-control"
+									value="#{createInsuranceController.yearsToAdd}">
+									<f:selectItem itemLabel="--Select--" itemValue="" />
+									<f:selectItem itemLabel="1 Year" itemValue="1" />
+									<f:selectItem itemLabel="2 Years" itemValue="2" />
+									<f:selectItem itemLabel="3 Years" itemValue="3" />
+									<f:selectItem itemLabel="5 Years" itemValue="5" />
+									<f:selectItem itemLabel="10 Years" itemValue="10" />
+									<f:selectItem itemLabel="12 Years" itemValue="12" />
+								</h:selectOneMenu>
+								<br />
+								<h:message for="yearsToAdd" styleClass="error-message" />
+							</div>
 
-						<!-- Date and Member Info -->
-						<div class="form-group">
-							<label for="activeOn" class="required-field">Active On</label>
-							<h:inputText id="activeOn" styleClass="form-control date-input"
-								value="#{createInsuranceController.insurancePlan.activeOn}">
-								<f:convertDateTime pattern="yyyy-MM-dd" />
-							</h:inputText>
-							<br />
-							<h:message for="activeOn" styleClass="error-message" />
-						</div>
+							<!-- Date and Member Info -->
+							<div class="form-group">
+								<label for="activeOn" class="required-field">Active On</label>
+								<h:inputText id="activeOn" styleClass="form-control date-input"
+									value="#{createInsuranceController.insurancePlan.activeOn}">
+									<f:convertDateTime pattern="yyyy-MM-dd" />
+								</h:inputText>
+								<br />
+								<h:message for="activeOn" styleClass="error-message" />
+							</div>
 
-						<div class="form-group">
-							<label for="maximumMemberAllowed" class="required-field">Maximum
-								Members Allowed</label>
-							<h:selectOneMenu id="maximumMemberAllowed"
-								styleClass="form-control"
-								value="#{createInsuranceController.insurancePlan.maximumMemberAllowed}">
-								<f:selectItem itemLabel="-- Select --" itemValue="" />
-								<f:selectItem itemLabel="1" itemValue="1" />
-								<f:selectItem itemLabel="2" itemValue="2" />
-								<f:selectItem itemLabel="3" itemValue="3" />
-								<f:selectItem itemLabel="4" itemValue="4" />
-								<f:selectItem itemLabel="5" itemValue="5" />
-								<f:selectItem itemLabel="6" itemValue="6" />
-								<f:selectItem itemLabel="7" itemValue="7" />
-								<f:selectItem itemLabel="8" itemValue="8" />
-							</h:selectOneMenu>
-							<br />
-							<h:message for="maximumMemberAllowed" styleClass="error-message" />
-						</div>
+							<div class="form-group">
+								<label for="maximumMemberAllowed" class="required-field">Maximum
+									Members Allowed</label>
+								<h:selectOneMenu id="maximumMemberAllowed"
+									styleClass="form-control"
+									value="#{createInsuranceController.insurancePlan.maximumMemberAllowed}">
+									<f:selectItem itemLabel="-- Select --" itemValue="" />
+									<f:selectItem itemLabel="1" itemValue="1" />
+									<f:selectItem itemLabel="2" itemValue="2" />
+									<f:selectItem itemLabel="3" itemValue="3" />
+									<f:selectItem itemLabel="4" itemValue="4" />
+									<f:selectItem itemLabel="5" itemValue="5" />
+									<f:selectItem itemLabel="6" itemValue="6" />
+									<f:selectItem itemLabel="7" itemValue="7" />
+									<f:selectItem itemLabel="8" itemValue="8" />
+								</h:selectOneMenu>
+								<br />
+								<h:message for="maximumMemberAllowed" styleClass="error-message" />
+							</div>
 
-						<div class="form-group">
-							<label for="minimumMemberAllowed" class="required-field">Minimum
-								Members Allowed</label>
-							<h:selectOneMenu id="minimumMemberAllowed"
-								styleClass="form-control"
-								value="#{createInsuranceController.insurancePlan.minimumMeberAllowed}">
-								<f:selectItem itemLabel="-- Select --" itemValue="" />
-								<f:selectItem itemLabel="1" itemValue="1" />
-								<f:selectItem itemLabel="2" itemValue="2" />
-							</h:selectOneMenu>
-							<br />
-							<h:message for="minimumMemberAllowed" styleClass="error-message" />
-						</div>
+							<div class="form-group">
+								<label for="minimumMemberAllowed" class="required-field">Minimum
+									Members Allowed</label>
+								<h:selectOneMenu id="minimumMemberAllowed"
+									styleClass="form-control"
+									value="#{createInsuranceController.insurancePlan.minimumMeberAllowed}">
+									<f:selectItem itemLabel="-- Select --" itemValue="" />
+									<f:selectItem itemLabel="1" itemValue="1" />
+									<f:selectItem itemLabel="2" itemValue="2" />
+								</h:selectOneMenu>
+								<br />
+								<h:message for="minimumMemberAllowed" styleClass="error-message" />
+							</div>
 
-						<div class="form-group" style="grid-column: 1/-1;">
-							<label for="description" class="required-field">Description</label>
-							<h:inputTextarea id="description" styleClass="form-control"
-								value="#{createInsuranceController.insurancePlan.description}"
-								rows="4" />
-							<br />
-							<h:message for="description" styleClass="error-message" />
+							<div class="form-group" style="grid-column: 1/-1;">
+								<label for="description" class="required-field">Description</label>
+								<h:inputTextarea id="description" styleClass="form-control"
+									value="#{createInsuranceController.insurancePlan.description}"
+									rows="4" />
+								<br />
+								<h:message for="description" styleClass="error-message" />
+							</div>
 						</div>
 					</div>
-
 					<!-- Member Details Section -->
 					<div class="card" style="margin-top: 20px;">
 						<div class="card-header">Member Details</div>
