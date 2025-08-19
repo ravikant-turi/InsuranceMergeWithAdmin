@@ -65,22 +65,35 @@
 							<!-- Age Limits -->
 							<div class="form-group">
 								<label for="maxAge" class="required-field">Max Age</label>
-								<h:inputText id="maxAge" styleClass="form-control"
+								<h:selectOneMenu id="maxAge" styleClass="form-control"
 									value="#{createInsuranceController.insurancePlan.maxEntryAge}">
-									<f:convertNumber type="number" />
-								</h:inputText>
+									<f:selectItem itemLabel="Select Age" itemValue="" />
+									<f:selectItem itemLabel="65 Years" itemValue="65" />
+									<f:selectItem itemLabel="66 Years" itemValue="66" />
+									<f:selectItem itemLabel="67 Years" itemValue="67" />
+									<f:selectItem itemLabel="68 Years" itemValue="68" />
+									<f:selectItem itemLabel="69 Years" itemValue="69" />
+									<f:selectItem itemLabel="70 Years" itemValue="70" />
+								</h:selectOneMenu>
+								<br />
 								<h:message for="maxAge" styleClass="error-message" />
 							</div>
 
+
 							<div class="form-group">
 								<label for="minAge" class="required-field">Min Age</label>
-								<h:inputText id="minAge" styleClass="form-control"
+								<h:selectOneMenu id="minAge" styleClass="form-control"
 									value="#{createInsuranceController.insurancePlan.minEntryAge}">
-									<f:convertNumber type="number" />
-								</h:inputText>
-								<br /> 
+									<f:selectItem itemLabel="Select Age" itemValue="" />
+									<f:selectItem itemLabel="1 Year" itemValue="1" />
+									<f:selectItem itemLabel="2 Years" itemValue="2" />
+									<f:selectItem itemLabel="3 Years" itemValue="3" />
+									<f:selectItem itemLabel="18 Years" itemValue="18" />
+								</h:selectOneMenu>
+								<br />
 								<h:message for="minAge" styleClass="error-message" />
 							</div>
+
 
 							<div class="form-group">
 								<label for="periodicDiseases" class="required-field">Periodic
@@ -155,14 +168,14 @@
 									styleClass="form-control"
 									value="#{createInsuranceController.insurancePlan.maximumMemberAllowed}">
 									<f:selectItem itemLabel="-- Select --" itemValue="" />
-									<f:selectItem itemLabel="1" itemValue="1" />
-									<f:selectItem itemLabel="2" itemValue="2" />
-									<f:selectItem itemLabel="3" itemValue="3" />
-									<f:selectItem itemLabel="4" itemValue="4" />
-									<f:selectItem itemLabel="5" itemValue="5" />
-									<f:selectItem itemLabel="6" itemValue="6" />
-									<f:selectItem itemLabel="7" itemValue="7" />
-									<f:selectItem itemLabel="8" itemValue="8" />
+									<f:selectItem itemLabel="1 member" itemValue="1" />
+									<f:selectItem itemLabel="2 member" itemValue="2" />
+									<f:selectItem itemLabel="3 member" itemValue="3" />
+									<f:selectItem itemLabel="4 member" itemValue="4" />
+									<f:selectItem itemLabel="5 member" itemValue="5" />
+									<f:selectItem itemLabel="6 member" itemValue="6" />
+									<f:selectItem itemLabel="7 member" itemValue="7" />
+									<f:selectItem itemLabel="8 member" itemValue="8" />
 								</h:selectOneMenu>
 								<br />
 								<h:message for="maximumMemberAllowed" styleClass="error-message" />
@@ -175,8 +188,8 @@
 									styleClass="form-control"
 									value="#{createInsuranceController.insurancePlan.minimumMeberAllowed}">
 									<f:selectItem itemLabel="-- Select --" itemValue="" />
-									<f:selectItem itemLabel="1" itemValue="1" />
-									<f:selectItem itemLabel="2" itemValue="2" />
+									<f:selectItem itemLabel="1 member" itemValue="1" />
+									<f:selectItem itemLabel="2 member" itemValue="2" />
 								</h:selectOneMenu>
 								<br />
 								<h:message for="minimumMemberAllowed" styleClass="error-message" />

@@ -3,7 +3,7 @@
  * Copyright © 2025 Infinite Computer Solution. All rights reserved.
  * -----------------------------------------------------------------------------
  * 
- * @Author  : Sourav Kumar Das
+ * @Author  : Infinite Computer Solution
  * @Purpose : This class handles UI-layer interactions and business coordination 
  *            for user-related workflows including registration, OTP verification, 
  *            login, logout, and password reset. It communicates with the 
@@ -26,8 +26,8 @@ import com.infinite.jsf.admin.model.User;
 import com.infinite.jsf.admin.service.AdminService;
 
 public class AdminController {
-	
-	//Logger Instance for Controller
+
+	// Logger Instance for Controller
 	private static final Logger logger = Logger.getLogger(AdminController.class);
 
 	private User user;
@@ -44,6 +44,7 @@ public class AdminController {
 	public boolean isOtpResendBlocked() {
 		return otpResendBlocked;
 	}
+
 	public void setOtpResendBlocked(boolean otpResendBlocked) {
 		this.otpResendBlocked = otpResendBlocked;
 	}
@@ -103,15 +104,15 @@ public class AdminController {
 	public void setOtp(String otp) {
 		this.otp = otp;
 	}
-	
+
 	/**
-	 *  Handles the resend OTP operation during user signup.
+	 * Handles the resend OTP operation during user signup.
 	 *
 	 * @return String
 	 */
 	public String resendOtp() {
-		User sessionUser = (User) FacesContext.getCurrentInstance()
-				.getExternalContext().getSessionMap().get("tempUser");
+		User sessionUser = (User) FacesContext.getCurrentInstance().getExternalContext().getSessionMap()
+				.get("tempUser");
 
 		if (sessionUser == null) {
 			FacesContext.getCurrentInstance().addMessage(null,
@@ -127,8 +128,7 @@ public class AdminController {
 			otpResendBlocked = true;
 			String msg = Resend_Otp.get("otp");
 			logger.warn("OTP resend blocked for 30 mins: " + msg);
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_WARN, msg, null));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, msg, null));
 			return null;
 		}
 		otpResendBlocked = false;
@@ -138,8 +138,8 @@ public class AdminController {
 					new FacesMessage(FacesMessage.SEVERITY_INFO, "OTP resend successfully.", null));
 			otpSent = true; // ✅ Ensure state is preserved
 		} else {
-			Resend_Otp.forEach((k, v) -> FacesContext.getCurrentInstance()
-					.addMessage(k, new FacesMessage(FacesMessage.SEVERITY_WARN, v, null)));
+			Resend_Otp.forEach((k, v) -> FacesContext.getCurrentInstance().addMessage(k,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, v, null)));
 		}
 
 		return null;
@@ -172,8 +172,7 @@ public class AdminController {
 			otpResendBlocked = true;
 			String msg = SignUp_Otp.get("otp");
 			logger.warn("OTP blocked for 30 mins: " + msg);
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_WARN, msg, null));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, msg, null));
 			return null;
 		}
 		otpResendBlocked = false;
@@ -193,8 +192,6 @@ public class AdminController {
 
 		return null;
 	}
-
-
 
 	/**
 	 * Verifies OTP and registers the user during signup.
@@ -229,22 +226,21 @@ public class AdminController {
 			user = new User(); // ✅ Clear user
 			otp = null;
 			otpSent = false;
-			return "Login.jsp?faces-redirect=true"; 
+			return "Login.jsp?faces-redirect=true";
 		} else {
 			logger.warn("User registration failed for: " + user.getEmail());
 			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Registration failed. Please verify  OTP.", null));
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Registration failed. Please verify  OTP.", null));
 		}
 
 		return null;
 	}
 
 	/**
-	 * Handles user login using username/email and password.
-	 * Validates credentials and redirects to dashboard on success.
+	 * Handles user login using username/email and password. Validates credentials
+	 * and redirects to dashboard on success.
 	 *
-	 * @return String 
+	 * @return String
 	 */
 	public String login() {
 		logger.info("Login attempt for username/email: " + user.getUsername());
@@ -252,13 +248,13 @@ public class AdminController {
 		Map<String, String> result = service.login(user.getUsername(), user.getPassword());
 
 		if (result.containsKey("success")) {
-			User loggedInUser = user.getUsername().contains("@")
-					? service.findByEmail(user.getUsername())
-							: service.findByUsername(user.getUsername());
+			User loggedInUser = user.getUsername().contains("@") ? service.findByEmail(user.getUsername())
+					: service.findByUsername(user.getUsername());
 
 			FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("loggedInUser", loggedInUser);
 
-			FacesContext.getCurrentInstance().getExternalContext().getFlash().put("loginSuccess", "Welcome " + loggedInUser.getFirstName());
+			FacesContext.getCurrentInstance().getExternalContext().getFlash().put("loginSuccess",
+					"Welcome " + loggedInUser.getFirstName());
 
 			logger.info("Login successful for user: " + loggedInUser.getUsername());
 
@@ -267,8 +263,7 @@ public class AdminController {
 			otpSent = false;
 
 			return "AdminDashBoard.jsp?faces-redirect=true";
-		}
-		else {
+		} else {
 
 			for (Map.Entry<String, String> entry : result.entrySet()) {
 				String key = entry.getKey();
@@ -276,31 +271,34 @@ public class AdminController {
 
 				if ("username".equals(key) || "email".equals(key)) {
 					// Attach all errors including generic ones to the username/email input
-					FacesContext.getCurrentInstance().addMessage("username", new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
+					FacesContext.getCurrentInstance().addMessage("username",
+							new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
 				} else if ("password".equals(key)) {
-					FacesContext.getCurrentInstance().addMessage("password", new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
+					FacesContext.getCurrentInstance().addMessage("password",
+							new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
 				}
 			}
 		}
 		logger.warn("Login failed for input: " + user.getUsername());
 		return null;
 	}
-	
+
 	/**
 	 * Handles user logout by clearing session and user data.
 	 *
 	 * @return String navigation outcome based on logout result
 	 */
 	public String logout() {
-		// Getting User stored from session 
-		User loggedInUser = (User) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("loggedInUser");
+		// Getting User stored from session
+		User loggedInUser = (User) FacesContext.getCurrentInstance().getExternalContext().getSessionMap()
+				.get("loggedInUser");
 
 		if (loggedInUser == null) {
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_WARN, "No user is logged in.", null));
 			return null;
 		}
-		//Getting User From logged User
+		// Getting User From logged User
 		int userId = loggedInUser.getUserId();
 
 		boolean result = service.logout(userId);
@@ -390,8 +388,8 @@ public class AdminController {
 		boolean isOtpValid = service.verifyForgotPasswordOtp(usernameOrEmail.trim(), otp.trim());
 
 		if (isOtpValid) {
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_INFO, "OTP verified. You can now reset your password.", null));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+					"OTP verified. You can now reset your password.", null));
 			// Redirect to reset password page
 			return "ResetPassword.jsp?faces-redirect=true";
 		} else {
@@ -400,9 +398,10 @@ public class AdminController {
 			return null;
 		}
 	}
-	
+
 	/**
-	 * Handles password reset after successful OTP verification during forgot password flow.
+	 * Handles password reset after successful OTP verification during forgot
+	 * password flow.
 	 *
 	 * @return String navigation outcome to login page on success, else null
 	 */
@@ -428,8 +427,8 @@ public class AdminController {
 		}
 
 		if (!newPassword.equals(confirmPassword)) {
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "New password and confirm password do not match.", null));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+					"New password and confirm password do not match.", null));
 			return null;
 		}
 
@@ -446,8 +445,8 @@ public class AdminController {
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, result.get("reused_password"), null));
 		} else {
 			logger.info("Password reset successful for user: " + input);
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_INFO, "Password has been reset successfully. Please login.", null));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+					"Password has been reset successfully. Please login.", null));
 
 			// Clear fields
 			usernameOrEmail = null;

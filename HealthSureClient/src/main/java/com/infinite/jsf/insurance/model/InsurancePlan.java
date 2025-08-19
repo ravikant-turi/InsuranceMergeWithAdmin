@@ -35,8 +35,11 @@ public class InsurancePlan implements Serializable {
 	private int waitingPeriod;
 
 	private Date createdOn = new Date();
+
 	private Date expireDate;
+
 	private Date activeOn;
+
 	private String periodicDiseases; // YES or NO
 
 	private int maximumMemberAllowed;

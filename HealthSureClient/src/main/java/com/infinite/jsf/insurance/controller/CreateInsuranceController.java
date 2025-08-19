@@ -261,17 +261,14 @@ public class CreateInsuranceController {
 
 		// insuranceplan created date will be today
 		logger.info("add todays date to a insurace createdOn date  ");
-
 		insurancePlan.setCreatedOn(new Date());
 
 		// Link coverage options to the plan
 		logger.info("adding silver option to the insurance plan");
 		coverageOption1.setInsurancePlan(insurancePlan);
 		logger.info("adding gold option to the insurance plan");
-
 		coverageOption2.setInsurancePlan(insurancePlan);
 		logger.info("adding platinum option to the insurance plan");
-
 		coverageOption3.setInsurancePlan(insurancePlan);
 
 		// Step 1: Validate Silver (mandatory)
@@ -282,23 +279,25 @@ public class CreateInsuranceController {
 
 		if (!silverValid) {
 			logger.info("silver plan  condition Failed");
-			return null; // Silver is mandatory
+			return null;
 		}
 
 		// Step 2: If Gold or Platinum is selected, validate them
-		System.out.println("=============for gold=====================");
+		System.out.println("============= for gold validation =====================");
 		logger.info("checking the condition for gold ");
-
 		logger.info("is gold : " + isGold);
-		logger.info("goldObject Validations " + validateInsuranceCoverageOptionWithFacesMessage2(coverageOption2));
+		logger.info("goldObject Validations : " + validateInsuranceCoverageOptionWithFacesMessage2(coverageOption2));
 		logger.info("amount validation for gold " + validatePremiumAndCoverrageAmountOfAllCoverageOptions(
 				coverageOption1, coverageOption2, coverageOption3));
-		if (isGold && !validateInsuranceCoverageOptionWithFacesMessage2(coverageOption2)
-				&& !validatePremiumAndCoverrageAmountOfAllCoverageOptions(coverageOption1, coverageOption2,
-						coverageOption3)) {
+
+		if (isGold && (!validateInsuranceCoverageOptionWithFacesMessage2(coverageOption2)
+				|| !validatePremiumAndCoverrageAmountOfAllCoverageOptions(coverageOption1, coverageOption2,
+						coverageOption3))) {
+
 			logger.info("Gold condition Failed");
 			return null; // Gold selected but invalid
 		}
+
 		System.out.println("==================for platimum==================");
 		logger.info("checking the platinum conditions");
 		logger.info("is platinum : " + isPlatinum);
@@ -306,9 +305,9 @@ public class CreateInsuranceController {
 				+ validateInsuranceCoverageOptionWithFacesMessage3(coverageOption3));
 		logger.info("amount validation " + validatePremiumAndCoverrageAmountOfAllCoverageOptions(coverageOption1,
 				coverageOption2, coverageOption3));
-		if (isPlatinum && !validateInsuranceCoverageOptionWithFacesMessage3(coverageOption3)
-				&& !validatePremiumAndCoverrageAmountOfAllCoverageOptions(coverageOption1, coverageOption2,
-						coverageOption3)) {
+		if (isPlatinum && (!validateInsuranceCoverageOptionWithFacesMessage3(coverageOption3)
+				|| !validatePremiumAndCoverrageAmountOfAllCoverageOptions(coverageOption1, coverageOption2,
+						coverageOption3))) {
 			logger.info("Platinum condition Failed");
 
 			return null; // Platinum selected but invalid
@@ -917,8 +916,13 @@ public class CreateInsuranceController {
 
 		else if (coverAmount == 0) {
 			context.addMessage("companyForm:cover",
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.COVER_AMOUNT_CANNOT_ZERO, null));
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.COVER_AMOUNT_REQUIRED, null));
 			logger.info("Cover amount must be greater than zero.");
+			isValid = false;
+		} else if (coverAmount < 500 && coverAmount > 50000000) {
+			context.addMessage("companyForm:cover",
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.COVERAGE_AMOUNT_RANGE, null));
+			logger.info("Cover amount must be in the range coverAmount<500 && coverAmount>50000000");
 			isValid = false;
 		}
 
@@ -928,9 +932,13 @@ public class CreateInsuranceController {
 			context.addMessage("companyForm:minAge",
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.MIN_AGE_REQUIRED, null));
 			isValid = false;
-		} else if (minAge <= 0) {
+		} else if (minAge < 0) {
 			context.addMessage("companyForm:minAge",
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.MIN_AGE_INVALID, null));
+			isValid = false;
+		} else if (minAge == 0) {
+			context.addMessage("companyForm:minAge",
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.MIN_AGE_REQUIRED, null));
 			isValid = false;
 		}
 
@@ -940,9 +948,13 @@ public class CreateInsuranceController {
 			context.addMessage("companyForm:maxAge",
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.MAX_AGE_REQUIRED, null));
 			isValid = false;
-		} else if (maxAge <= 0) {
+		} else if (maxAge < 0) {
 			context.addMessage("companyForm:maxAge",
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.MAX_AGE_INVALID, null));
+			isValid = false;
+		} else if (maxAge == 0) {
+			context.addMessage("companyForm:maxAge",
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.MAX_AGE_REQUIRED, null));
 			isValid = false;
 		} else if (minAge != null && maxAge < minAge) {
 			context.addMessage("companyForm:maxAge",
@@ -978,13 +990,13 @@ public class CreateInsuranceController {
 				isValid = false;
 			}
 			if (plan.getMinimumMeberAllowed() < 2) {
-				context.addMessage("companyForm:minimumMeberAllowed", new FacesMessage(FacesMessage.SEVERITY_ERROR,
+				context.addMessage("companyForm:minimumMemberAllowed", new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						validationMessages.MIN_MEMBER_FAMILY_REQUIRED, null));
 				logger.info(validationMessages.MIN_MEMBER_FAMILY_REQUIRED);
 				isValid = false;
 			}
 			if (plan.getMinimumMeberAllowed() > plan.getMaximumMemberAllowed()) {
-				context.addMessage("companyForm:minimumMeberAllowed",
+				context.addMessage("companyForm:minimumMemberAllowed",
 						new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.MIN_GREATER_THAN_MAX, null));
 				logger.info(validationMessages.MIN_GREATER_THAN_MAX);
 				isValid = false;
@@ -993,27 +1005,45 @@ public class CreateInsuranceController {
 		// 7.Minimum and Maximum Member Validation for INDIVIDUAL
 
 		if (plan.getPlanType() != null && plan.getPlanType().equals(PlanType.INDIVIDUAL)) {
-			if (plan.getMaximumMemberAllowed() != 1) {
-				context.addMessage("companyForm:maximumMemberAllowed", new FacesMessage(FacesMessage.SEVERITY_ERROR,
-						validationMessages.INDIVIDUAL_MEMBER_ALLOWED, null));
+			if (plan.getMaximumMemberAllowed() == 0) {
+				context.addMessage("companyForm:maximumMemberAllowed",
+						new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.MAX_MEMBER_REQUIRED, null));
+				logger.info(validationMessages.MAX_MEMBER_REQUIRED);
+				isValid = false;
+			}
+			if (plan.getMinimumMeberAllowed() == 0) {
+				context.addMessage("companyForm:minimumMeberAllowed",
+						new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.MIN_MEMBER_REQUIRED, null));
 				logger.info(validationMessages.MAX_MEMBER_REQUIRED);
 				isValid = false;
 			}
 			if (plan.getMaximumMemberAllowed() != 1) {
-				context.addMessage("companyForm:maximumMemberAllowed",
-						new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.MAX_MEMBER_REQUIRED, null));
-				logger.info(validationMessages.MAX_MEMBER_REQUIRED);
+				context.addMessage("companyForm:maximumMemberAllowed", new FacesMessage(FacesMessage.SEVERITY_ERROR,
+						validationMessages.INDIVIDUAL_MEMBER_ALLOWED, null));
+				logger.info(validationMessages.INDIVIDUAL_MEMBER_ALLOWED);
+				isValid = false;
+			}
+			if (plan.getMinimumMeberAllowed() != 1) {
+				context.addMessage("companyForm:minimumMemberAllowed", new FacesMessage(FacesMessage.SEVERITY_ERROR,
+						validationMessages.INDIVIDUAL_MEMBER_ALLOWED, null));
+				logger.info(validationMessages.INDIVIDUAL_MEMBER_ALLOWED);
 				isValid = false;
 			}
 		}
 		// 8. Waiting Period
 
 		int waitingPeriod = plan.getWaitingPeriod();
+		if (waitingPeriod == 0) {
+			context.addMessage("companyForm:waitingPeriod",
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.WAITING_PERIOD_REQUIRED, null));
+			logger.info("Waiting period is required.");
+			isValid = false;
+		}
 
-		if (waitingPeriod <= 0 || waitingPeriod > 12) {
+		if (waitingPeriod < 0 || waitingPeriod > 3) {
 			context.addMessage("companyForm:waitingPeriod", new FacesMessage(FacesMessage.SEVERITY_ERROR,
 					validationMessages.WAITING_PERIOD_OUT_OF_RANGE, null));
-			logger.info("Waiting period must be between 0 and 12 months.");
+			logger.info("Waiting period must be between 0 and 3 months.");
 			isValid = false;
 		}
 

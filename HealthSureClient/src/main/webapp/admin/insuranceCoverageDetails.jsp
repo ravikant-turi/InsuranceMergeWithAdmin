@@ -414,10 +414,9 @@ h\:outputText {
 
 			<div class="button-row">
 
-				<h:commandButton value="Back"
-					action="AInsuranceAdminDashBoard.jsp"
+				<h:commandButton value="Back" action="insuranceAdminDashBoard.jsp"
 					styleClass="action-btn right-btn" />
-				<h:commandButton value="Cancel" action="AInsuranceAdminDashBoard.jsp"
+				<h:commandButton value="Cancel" action="insuranceAdminDashBoard.jsp"
 					styleClass="action-btn" />
 			</div>
 		</div>

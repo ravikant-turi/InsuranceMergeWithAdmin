@@ -30,7 +30,7 @@ public class CreateInsuranceMessageConstants {
 	public final String MIN_MEMBER_NEGATIVE = "Minimum member cannot be negative.";
 	public final String MIN_MEMBER_ZERO = "Minimum member cannot be zero.";
 	// Individual member
-	public final String INDIVIDUAL_MEMBER_ALLOWED = "Only one member is allowed individual";
+	public final String INDIVIDUAL_MEMBER_ALLOWED = "Only one member is allowed in individual";
 	public final String PLAN_NAME_REQUIRED = "Plan name is required.";
 	public final String PLAN_NAME_TOO_SHORT = "Plan name must be at least 4 characters.";
 	public final String PLAN_NAME_INVALID = "Plan name must contain only alphabetic characters (no digits or special characters).";
@@ -51,8 +51,9 @@ public class CreateInsuranceMessageConstants {
 	public final String MAX_AGE_INVALID = "Maximum age must be greater than 0.";
 	public final String MAX_AGE_LESS_THAN_MIN = "Maximum age must be greater than or equal to minimum age.";
 	public final String MAX_AGE_TOO_HIGH = "Maximum age must not be greater than 70.";
+
 	public final String WAITING_PERIOD_INVALID = "Invalid waiting period.";
-	public final String WAITING_PERIOD_OUT_OF_RANGE = "Waiting period must be between 0 and 12 months.";
+	public final String WAITING_PERIOD_OUT_OF_RANGE = "Waiting period must be between 0 and 3 months.";
 	public final String PERIODIC_DISEASES_REQUIRED = "Periodic diseases field is required.";
 	public final String PLAN_TYPE_REQUIRED = "Plan Type field is required.";
 	public final String ACTIVE_ON_REQUIRED = "Active On date is required.";
@@ -67,8 +68,9 @@ public class CreateInsuranceMessageConstants {
 	public final String MAX_MEMBER_FAMILY_EXCEEDED = "Maximum 8 members are allowed in FAMILY plan.";
 	public final String MIN_MEMBER_FAMILY_REQUIRED = "At least 2 members must be selected in FAMILY plan.";
 	public final String MIN_GREATER_THAN_MAX = "Minimum members cannot be greater than maximum entry age.";
-	public final String MAX_MEMBER_REQUIRED = "Maximum member must be greater than zero.";
-	public final String MIN_MEMBER_REQUIRED = "Minimum member must be grater than zero.";
+//	public final String MAX_MEMBER_REQUIRED = "Maximum member must be greater than zero.";
+	public final String MAX_MEMBER_REQUIRED = "Maximum member is required.";
+	public final String MIN_MEMBER_REQUIRED = "Minimum member is required.";
 
 	// Add more constants as needed
 

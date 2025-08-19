@@ -25,9 +25,18 @@ body {
 	padding: 20px;
 	border-radius: 10px;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+	
 	margin-bottom: 30px;
 }
-
+/* Main Container */
+.form-box {
+	background-color: #ffffff;
+	padding: 40px;
+	border-radius: 12px;
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+	max-width: 1100px;
+	margin: auto;
+}
 .form-row {
 	display: flex;
 	gap: 20px;
