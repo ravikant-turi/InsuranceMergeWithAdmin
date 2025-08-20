@@ -42,6 +42,14 @@ h3 {
 	font-size: 24px;
 }
 
+.section-title {
+	background-color: #3498db;
+	color: white;
+	padding: 10px 15px;
+	border-radius: 8px;
+	text-align: center;
+}
+
 /* Row Layout */
 .form-row {
 	display: flex;
@@ -174,12 +182,53 @@ h\:outputText {
 .planDetails {
 	margin-left: 20px;
 }
+
+.coverage-table {
+	width: 90%;
+	margin: 20px auto;
+	border-collapse: collapse;
+	font-family: Arial, sans-serif;
+}
+
+.coverage-table th {
+	background-color: #2980b9;
+	color: white;
+	padding: 8px;
+	text-align: center;
+}
+
+.coverage-table td {
+	background-color: #ecf0f1;
+	padding: 8px;
+	text-align: center;
+}
+
+.coverage-table tr:nth-child(even) td {
+	background-color: #d0e4f7;
+}
+
+.coverage-table tr:hover td {
+	background-color: #b2bec3;
+}
+
+.coverage-table, .coverage-table th, .coverage-table td {
+	border: 1px solid #34495e;
+}
+
+.h-panelgroup {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+}
 </style>
 </head>
 <body>
+
 	<h:form id="companyForm">
 		<div class="form-box">
-			<h3>Insurance Plan Details</h3>
+			<h3 class="section-title">Insurance Plan Details</h3>
+			<h3>Plan Details</h3>
 			<div class="planDetails">
 				<!-- Row 1 -->
 				<div class="form-row">
@@ -281,7 +330,7 @@ h\:outputText {
 			<!-- Multiple selection for Members -->
 			<div>
 				<h3>
-					<h:outputLabel id="memberValidation"> Members allowed in the plan </h:outputLabel>
+					<h:outputLabel id="memberValidation"> Members Allowed In The Plan </h:outputLabel>
 				</h3>
 
 
@@ -338,80 +387,46 @@ h\:outputText {
 				</div>
 				<br />
 			</div>
-			<!-- Coverage Options -->
-			<h3>Show Coverage Options</h3>
-			<div class="form-row">
+			<h3>Coverage Options</h3>
+			<h:dataTable
+				value="#{createInsuranceController.planwithCovrageDetailsList}"
+				var="coverage" styleClass="coverage-table" border="1">
+				<h:column>
+					<f:facet name="header">
+						<h:panelGroup layout="block" styleClass="h-panelgroup">
+							<h:outputText value="Coverage Type" />
+						</h:panelGroup>
+					</f:facet>
+					<h:outputText value="#{coverage.coverageType}" />
+				</h:column>
 
-				<!-- Coverage Option 1 -->
-				<div class="coverage-box">
-					<h3>Silver Option</h3>
+				<h:column>
+					<f:facet name="header">
+						<h:panelGroup layout="block" styleClass="h-panelgroup">
+							<h:outputText value="Premium Amount" />
+						</h:panelGroup>
+					</f:facet>
+					<h:outputText value="#{coverage.premiumAmount}" />
+				</h:column>
 
-					<div class="form-group">
-						<label>Premium Amount:</label>
-						<h:outputText
-							value="#{createInsuranceController.coverageOption1.premiumAmount}" />
-					</div>
-
-					<div class="form-group">
-						<label>Coverage Amount:</label>
-						<h:outputText
-							value="#{createInsuranceController.coverageOption1.coverageAmount}" />
-					</div>
-
-					<div class="form-group">
-						<label>Coverage Type:</label>
-						<h:outputText
-							value="#{createInsuranceController.coverageOption1.coverageType}" />
-					</div>
-				</div>
-
-				<!-- Coverage Option 2 -->
-				<div class="coverage-box">
-					<h3>Gold Option</h3>
-
-					<div class="form-group">
-						<label>Premium Amount:</label>
-						<h:outputText
-							value="#{createInsuranceController.coverageOption2.premiumAmount}" />
-					</div>
-
-					<div class="form-group">
-						<label>Coverage Amount:</label>
-						<h:outputText
-							value="#{createInsuranceController.coverageOption2.coverageAmount}" />
-					</div>
-
-					<div class="form-group">
-						<label>Coverage Type:</label>
-						<h:outputText
-							value="#{createInsuranceController.coverageOption2.coverageType}" />
-					</div>
-				</div>
-
-				<!-- Coverage Option 3 -->
-				<div class="coverage-box">
-					<h3>Platinum Option</h3>
-
-					<div class="form-group">
-						<label>Premium Amount:</label>
-						<h:outputText
-							value="#{createInsuranceController.coverageOption3.premiumAmount}" />
-					</div>
-
-					<div class="form-group">
-						<label>Coverage Amount:</label>
-						<h:outputText
-							value="#{createInsuranceController.coverageOption3.coverageAmount}" />
-					</div>
-
-					<div class="form-group">
-						<label>Coverage Type:</label>
-						<h:outputText
-							value="#{createInsuranceController.coverageOption3.coverageType}" />
-					</div>
-				</div>
-			</div>
-
+				<h:column>
+					<f:facet name="header">
+						<h:panelGroup layout="block" styleClass="h-panelgroup">
+							<h:outputText value="Coverage Amount" />
+						</h:panelGroup>
+					</f:facet>
+					<h:outputText value="#{coverage.coverageAmount}" />
+				</h:column>
+				<h:column>
+					<f:facet name="header">
+						<h:panelGroup layout="block" styleClass="h-panelgroup">
+							<h:outputText value="Coverage status" />
+						</h:panelGroup>
+					</f:facet>
+					<h:outputText value="#{coverage.status}" />
+				</h:column>
+			</h:dataTable>
+			<br />
 			<div class="button-row">
 
 				<h:commandButton value="Back" action="insuranceAdminDashBoard.jsp"

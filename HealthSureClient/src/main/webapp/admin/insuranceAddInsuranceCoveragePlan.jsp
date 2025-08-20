@@ -208,7 +208,6 @@
 					</div>
 					<!-- Member Details Section -->
 					<div class="card" style="margin-top: 20px;">
-						<div class="card-header">Member Details</div>
 						<div class="card-body">
 
 							<h:panelGroup>

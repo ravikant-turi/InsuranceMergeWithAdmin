@@ -25,7 +25,6 @@ body {
 	padding: 20px;
 	border-radius: 10px;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-	
 	margin-bottom: 30px;
 }
 /* Main Container */
@@ -37,6 +36,7 @@ body {
 	max-width: 1100px;
 	margin: auto;
 }
+
 .form-row {
 	display: flex;
 	gap: 20px;
@@ -86,17 +86,6 @@ textarea {
 	background-color: #2980b9;
 }
 
-.coverage-box {
-	flex: 1;
-	text-align: center;
-	border: 2px solid green;
-}
-
-.coverage-box h3 {
-	margin-bottom: 15px;
-	color: #16a085;
-}
-
 .section-title {
 	background-color: #3498db;
 	color: white;
@@ -104,25 +93,7 @@ textarea {
 	border-radius: 8px;
 	text-align: center;
 	margin-bottom: 20px;
-	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 	height: 40px;
-	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.coverage-box form {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-
-.coverage-box label {
-	width: 100%;
-	text-align: left;
-}
-
-.coverage-box input[type="text"] {
-	width: 100%;
-	margin-bottom: 10px;
 }
 
 .center-button-container {
@@ -179,6 +150,45 @@ form {
 	color: red;
 	font-size: 12px;
 }
+
+.coverage-table {
+	width: 90%;
+	margin: 20px auto;
+	border-collapse: collapse;
+	font-family: Arial, sans-serif;
+}
+
+.coverage-table th {
+	background-color: #2980b9;
+	color: white;
+	padding: 8px;
+	text-align: center;
+}
+
+.coverage-table td {
+	background-color: #ecf0f1;
+	padding: 8px;
+	text-align: center;
+}
+
+.coverage-table tr:nth-child(even) td {
+	background-color: #d0e4f7;
+}
+
+.coverage-table tr:hover td {
+	background-color: #b2bec3;
+}
+
+.coverage-table, .coverage-table th, .coverage-table td {
+	border: 1px solid #34495e;
+}
+
+.h-panelgroup {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+}
 </style>
 
 </head>
@@ -195,13 +205,13 @@ form {
 	<div class="main-container">
 
 		<!-- Add Insurance Plan Form -->
-		<div class="header-container">
-			<h3 class="section-title">Update Insurance Plan</h3>
-		</div>
+		
 
 		<h:form id="companyForm">
 
 			<div class="form-box">
+				<h3 class="section-title">Update Insurance Plan</h3>
+
 				<h3>Plan Details</h3>
 
 				<!-- Row 1 -->
@@ -348,194 +358,133 @@ form {
 
 				</div>
 
-			</div>
-			<br />
-			<!-- Multiple selected for Members -->
-			<div>
-				<h3>
-					<h:outputLabel id="memberValidation">Multiple selection for Members </h:outputLabel>
-				</h3>
 
+				<br />
+				<!-- Multiple selected for Members -->
+				<div>
+					<h3>
+						<h:outputLabel id="memberValidation">Members Allowed In The Plan 
+						 </h:outputLabel>
+					</h3>
+
+
+					<br />
+
+					<div
+						style="padding-left: 35px; display: flex; flex-wrap: wrap; justify-content: space-evenly; width: 100%;">
+						<div style="flex: 1; min-width: 120px;">
+							<label><h:selectBooleanCheckbox disabled="true"
+									title="This field is read-only"
+									value="#{createInsuranceController.relationMap['DAUGHTER1']}" />
+								Daughter1</label>
+						</div>
+						<div style="flex: 1; min-width: 120px;">
+							<label><h:selectBooleanCheckbox disabled="true"
+									title="This field is read-only"
+									value="#{createInsuranceController.relationMap['DAUGHTER2']}" />
+								Daughter2</label>
+						</div>
+						<div style="flex: 1; min-width: 120px;">
+							<label><h:selectBooleanCheckbox disabled="true"
+									title="This field is read-only"
+									value="#{createInsuranceController.relationMap['SON1']}" />
+								Son1</label>
+						</div>
+						<div style="flex: 1; min-width: 120px;">
+							<label><h:selectBooleanCheckbox disabled="true"
+									title="This field is read-only"
+									value="#{createInsuranceController.relationMap['SON2']}" />
+								Son2</label>
+						</div>
+						<div style="flex: 1; min-width: 120px;">
+							<label><h:selectBooleanCheckbox disabled="true"
+									title="This field is read-only"
+									value="#{createInsuranceController.relationMap['FATHER']}" />
+								Father</label>
+						</div>
+						<div style="flex: 1; min-width: 120px;">
+							<label><h:selectBooleanCheckbox disabled="true"
+									title="This field is read-only"
+									value="#{createInsuranceController.relationMap['MOTHER']}" />
+								Mother</label>
+						</div>
+						<div style="flex: 1; min-width: 120px;">
+							<label><h:selectBooleanCheckbox disabled="true"
+									title="This field is read-only"
+									value="#{createInsuranceController.relationMap['HUSBAND']}" />
+								Husband</label>
+						</div>
+						<div style="flex: 1; min-width: 120px;">
+							<label><h:selectBooleanCheckbox disabled="true"
+									title="This field is read-only"
+									value="#{createInsuranceController.relationMap['WIFE']}" />
+								Wife</label>
+						</div>
+
+
+					</div>
+					<br />
+				</div>
+				<h:message for="memberValidation" styleClass="error" />
+				<br />
+				<h3>Coverage Options</h3>
+
+				<h:dataTable
+					value="#{createInsuranceController.planwithCovrageDetailsList}"
+					var="coverage" styleClass="coverage-table" border="1">
+					<h:column>
+						<f:facet name="header">
+							<h:panelGroup layout="block" styleClass="h-panelgroup">
+								<h:outputText value="Coverage Type" />
+							</h:panelGroup>
+						</f:facet>
+						<h:outputText value="#{coverage.coverageType}" />
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">
+							<h:panelGroup layout="block" styleClass="h-panelgroup">
+								<h:outputText value="Premium Amount" />
+							</h:panelGroup>
+						</f:facet>
+						<h:outputText value="#{coverage.premiumAmount}" />
+					</h:column>
+
+					<h:column>
+						<f:facet name="header">
+							<h:panelGroup layout="block" styleClass="h-panelgroup">
+								<h:outputText value="Coverage Amount" />
+							</h:panelGroup>
+						</f:facet>
+						<h:outputText value="#{coverage.coverageAmount}" />
+					</h:column>
+					<h:column>
+						<f:facet name="header">
+							<h:panelGroup layout="block" styleClass="h-panelgroup">
+								<h:outputText value="Coverage status" />
+							</h:panelGroup>
+						</f:facet>
+						<h:outputText value="#{coverage.status}" />
+					</h:column>
+				</h:dataTable>
 
 				<br />
 
-				<div
-					style="padding-left: 35px; display: flex; flex-wrap: wrap; justify-content: space-evenly; width: 100%;">
-					<div style="flex: 1; min-width: 120px;">
-						<label><h:selectBooleanCheckbox disabled="true"
-								title="This field is read-only"
-								value="#{createInsuranceController.relationMap['DAUGHTER1']}" />
-							Daughter1</label>
-					</div>
-					<div style="flex: 1; min-width: 120px;">
-						<label><h:selectBooleanCheckbox disabled="true"
-								title="This field is read-only"
-								value="#{createInsuranceController.relationMap['DAUGHTER2']}" />
-							Daughter2</label>
-					</div>
-					<div style="flex: 1; min-width: 120px;">
-						<label><h:selectBooleanCheckbox disabled="true"
-								title="This field is read-only"
-								value="#{createInsuranceController.relationMap['SON1']}" />
-							Son1</label>
-					</div>
-					<div style="flex: 1; min-width: 120px;">
-						<label><h:selectBooleanCheckbox disabled="true"
-								title="This field is read-only"
-								value="#{createInsuranceController.relationMap['SON2']}" />
-							Son2</label>
-					</div>
-					<div style="flex: 1; min-width: 120px;">
-						<label><h:selectBooleanCheckbox disabled="true"
-								title="This field is read-only"
-								value="#{createInsuranceController.relationMap['FATHER']}" />
-							Father</label>
-					</div>
-					<div style="flex: 1; min-width: 120px;">
-						<label><h:selectBooleanCheckbox disabled="true"
-								title="This field is read-only"
-								value="#{createInsuranceController.relationMap['MOTHER']}" />
-							Mother</label>
-					</div>
-					<div style="flex: 1; min-width: 120px;">
-						<label><h:selectBooleanCheckbox disabled="true"
-								title="This field is read-only"
-								value="#{createInsuranceController.relationMap['HUSBAND']}" />
-							Husband</label>
-					</div>
-					<div style="flex: 1; min-width: 120px;">
-						<label><h:selectBooleanCheckbox disabled="true"
-								title="This field is read-only"
-								value="#{createInsuranceController.relationMap['WIFE']}" />
-							Wife</label>
-					</div>
 
+				<!-- Submit Button -->
 
+				<div class="button-row">
+
+					<h:commandButton value="Cancel"
+						action="insuranceAdminDashBoard.jsf"
+						styleClass="action-btn right-btn" />
+					<h:commandButton value="Update"
+						action="#{createInsuranceController.updateInsurancePlanHelper(createInsuranceController.insurancePlan)}"
+						styleClass="action-btn" />
 				</div>
-				<br />
-			</div>
-			<h:message for="memberValidation" styleClass="error" />
-			<br />
-
-			<!-- Coverage Options -->
-			<h3>Update Coverage Options</h3>
-			<div class="form-row">
-
-				<!-- Coverage Option 1 -->
-				<div class="coverage-box">
-
-					<h3>Silver Option</h3>
-
-					<h:outputLabel escape="false"
-						value="<span style='color:red'>*</span>Premium Amount: " />
-					<h:inputText id="PremiumAmount" readonly="true"
-						title="This field is read-only"
-						value="#{createInsuranceController.coverageOption1.premiumAmount}" />
-					<h:message for="PremiumAmount" styleClass="error" />
-
-					<h:outputLabel escape="false"
-						value="<span style='color:red'>*</span>Coverage Amount: :" />
-					<h:inputText id="CoverageAmount" readonly="true"
-						title="This field is read-only"
-						value="#{createInsuranceController.coverageOption1.coverageAmount}" />
-					<h:message for="CoverageAmount" styleClass="error" />
-
-
-
-
-					<h:outputLabel escape="false"
-						value=" <span style='color:red'>*</span>CoverageType " />
-					<h:selectOneMenu id="coverageType" readonly="true"
-						title="This field is read-only"
-						value="#{createInsuranceController.coverageOption1.coverageType}">
-						<f:selectItem itemLabel="SILVER" itemValue="SILVER" />
-
-					</h:selectOneMenu>
-					<h:message for="coverageType" styleClass="error" />
-
-
-
-				</div>
-
-				<!-- Coverage Option 2 -->
-				<div class="coverage-box">
-					<h3>Gold Option</h3>
-					<h:outputLabel escape="false"
-						value="<span style='color:red'>*</span>Premium Amount: " />
-					<h:inputText id="PremiumAmount2" readonly="true"
-						title="This field is read-only"
-						value="#{createInsuranceController.coverageOption2.premiumAmount}" />
-					<h:message for="PremiumAmount2" styleClass="error" />
-
-					<h:outputLabel escape="false"
-						value="<span style='color:red'>*</span>Coverage Amount: :" />
-					<h:inputText id="CoverageAmount2" readonly="true"
-						title="This field is read-only"
-						value="#{createInsuranceController.coverageOption2.coverageAmount}" />
-					<h:message for="CoverageAmount2" styleClass="error" />
-
-					<h:outputLabel escape="false"
-						value=" <span style='color:red'>*</span>CoverageType " />
-					<h:selectOneMenu id="coverageType2" readonly="true"
-						title="This field is read-only"
-						value="#{createInsuranceController.coverageOption2.coverageType}">
-						<f:selectItem itemLabel="GOLD" itemValue="GOLD" />
-					</h:selectOneMenu>
-					<h:message for="coverageType2" styleClass="error" />
-
-
-				</div>
-
-				<!-- Coverage Option 3 -->
-				<div class="coverage-box">
-					<h3>Platinum Option</h3>
-					<h:outputLabel escape="false"
-						value="<span style='color:red'>*</span>Premium Amount: " />
-					<h:inputText id="PremiumAmount3" readonly="true"
-						title="This field is read-only"
-						value="#{createInsuranceController.coverageOption3.premiumAmount}" />
-					<h:message for="PremiumAmount3" styleClass="error" />
-
-					<h:outputLabel escape="false"
-						value="<span style='color:red'>*</span>Coverage Amount: :" />
-					<h:inputText id="CoverageAmount3" readonly="true"
-						title="This field is read-only"
-						value="#{createInsuranceController.coverageOption3.coverageAmount}" />
-					<h:message for="CoverageAmount3" styleClass="error" />
-
-
-					<h:outputLabel escape="false"
-						value=" <span style='color:red'>*</span>CoverageType " />
-					<h:selectOneMenu id="coverageType3" readonly="true"
-						title="This field is read-only"
-						value="#{createInsuranceController.coverageOption3.coverageType}">
-
-						<f:selectItem itemLabel="PLATINUM" itemValue="PLATINUM" />
-					</h:selectOneMenu>
-					<h:message for="coverageType3" styleClass="error" />
-					<br /> <br />
-					<!-- Multiple selection for Members -->
-
-
-
-
-				</div>
-			</div>
-			<br />
-
-
-			<!-- Submit Button -->
-
-			<div class="button-row">
-
-				<h:commandButton value="Cancel"
-					action="insuranceAdminDashBoard.jsf"
-					styleClass="action-btn right-btn" />
-				<h:commandButton value="Update"
-					action="#{createInsuranceController.updateInsurancePlanHelper(createInsuranceController.insurancePlan)}"
-					styleClass="action-btn" />
 			</div>
 		</h:form>
+
 	</div>
 	<h:messages globalOnly="true" style="color:red" />
 </body>
