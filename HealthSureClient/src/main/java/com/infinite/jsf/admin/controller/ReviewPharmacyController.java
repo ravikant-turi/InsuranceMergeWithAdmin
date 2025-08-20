@@ -192,7 +192,7 @@ public class ReviewPharmacyController {
 	}
 
 	// how many page numbers to show per row
-	private int pageBlockSize = pageSize;
+	private int pageBlockSize = 5;
 	// which block of pages user is viewing (starts at 0)
 	private int currentBlock = 0;
 

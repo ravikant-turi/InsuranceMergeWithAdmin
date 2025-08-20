@@ -283,26 +283,16 @@
 				</h:dataTable>
 			</div>
 
-			<!-- Pagination Controls -->
-			<div style="text-align: center; margin-top: 30px;">
-				<h:outputText
-					value="Page #{reviewPharmacyController.page + 1} of #{reviewPharmacyController.totalPages}"
-					style="margin-right: 20px; font-weight: 600; color: #2c3e50;" />
 
-				<h:commandButton value="Previous"
-					action="#{reviewPharmacyController.previousPage}"
-					disabled="#{reviewPharmacyController.page eq 0}"
-					style="margin-right: 10px;" styleClass="action-button" />
-
-				<h:commandButton value="Next"
-					action="#{reviewPharmacyController.nextPage}"
-					disabled="#{reviewPharmacyController.page + 1 ge reviewPharmacyController.totalPages}"
-					style="margin-left: 10px;" styleClass="action-button" />
-			</div>
 
 			<div
 				style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px;">
+				<div>
+					<h:outputText
+						value="Page #{reviewPharmacyController.page + 1} of #{reviewPharmacyController.totalPages}"
+						style="margin-right: 20px; font-weight: 600; color: #2c3e50;" />
 
+				</div>
 				<!-- Left: Page Number Block with Row Prev/Next -->
 				<div style="display: flex; align-items: center;">
 
@@ -329,23 +319,18 @@
 						style="margin-left: 8px;" styleClass="action-button" />
 				</div>
 
-				<!-- Right: Regular Prev/Next
-				<div>
-					<h:commandButton value="Previous"
-						action="#{reviewPharmacyController.previousBlock}"
-								disabled="#{pageNum == reviewPharmacyController.page + 1}"
-						style="margin-right: 10px;" styleClass="action-button" />
 
-					<h:commandButton value="Next"
-						action="#{reviewPharmacyController.nextBlock}"
-						disabled="#{reviewPharmacyController.currentBlock + 1 ge (reviewPharmacyController.totalPages / reviewPharmacyController.pageBlockSize)}"
-						styleClass="action-button" />
-				</div>
-				 -->
+
+				<!-- Right: Regular Prev/Next -->
 				<div>
-					<h:outputText styleClass="summary-details"
-						value="Showing #{(reviewPharmacyController.page+1)*reviewPharmacyController.pageSize} out of #{reviewPharmacyController.totalPages*reviewPharmacyController.pageSize} Result" />
+					<div>
+						<h:outputText
+							style="margin-right: 20px; font-weight: 600; color: #2c3e50;"
+							value="Showing #{(reviewPharmacyController.page+1)*reviewPharmacyController.pageSize} out of #{reviewPharmacyController.totalPages*reviewPharmacyController.pageSize} Result" />
+					</div>
 				</div>
+
+
 			</div>
 
 		</h:form>
