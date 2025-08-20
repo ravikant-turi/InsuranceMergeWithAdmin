@@ -114,7 +114,8 @@
 									Amount</label>
 								<h:inputText id="cover" styleClass="form-control"
 									value="#{createInsuranceController.insurancePlan.availableCoverAmounts}">
-									<f:convertNumber pattern="0.00" />
+									<f:convertNumber type="number" maxFractionDigits="2"
+										minFractionDigits="2" />
 								</h:inputText>
 								<br />
 								<h:message for="cover" styleClass="error-message" />
@@ -296,7 +297,10 @@
 										<label for="PremiumAmount" class="required-field">Premium
 											Amount</label>
 										<h:inputText id="PremiumAmount" styleClass="form-control"
-											value="#{createInsuranceController.coverageOption1.premiumAmount}" />
+											value="#{createInsuranceController.coverageOption1.premiumAmount}">
+											<f:convertNumber type="number" maxFractionDigits="2"
+												minFractionDigits="2" />
+										</h:inputText>
 										<br />
 										<h:message for="PremiumAmount" styleClass="error-message" />
 									</div>
@@ -305,7 +309,10 @@
 										<label for="CoverageAmount" class="required-field">Coverage
 											Amount</label>
 										<h:inputText id="CoverageAmount" styleClass="form-control"
-											value="#{createInsuranceController.coverageOption1.coverageAmount}" />
+											value="#{createInsuranceController.coverageOption1.coverageAmount}">
+											<f:convertNumber type="number" maxFractionDigits="2"
+												minFractionDigits="2" />
+										</h:inputText>
 										<br />
 										<h:message for="CoverageAmount" styleClass="error-message" />
 									</div>
@@ -333,7 +340,8 @@
 										<label for="PremiumAmount2">Premium Amount</label>
 										<h:inputText id="PremiumAmount2" styleClass="form-control"
 											value="#{createInsuranceController.coverageOption2.premiumAmount}">
-											<f:convertNumber type="number" />
+											<f:convertNumber type="number" maxFractionDigits="2"
+												minFractionDigits="2" />
 										</h:inputText>
 										<br />
 										<h:message for="PremiumAmount2" styleClass="error-message" />
@@ -343,7 +351,8 @@
 										<label for="CoverageAmount2">Coverage Amount</label>
 										<h:inputText id="CoverageAmount2" styleClass="form-control"
 											value="#{createInsuranceController.coverageOption2.coverageAmount}">
-											<f:convertNumber type="number" />
+											<f:convertNumber type="number" maxFractionDigits="2"
+												minFractionDigits="2" />
 										</h:inputText>
 										<br />
 										<h:message for="CoverageAmount2" styleClass="error-message" />
@@ -374,7 +383,8 @@
 										<label for="PremiumAmount3">Premium Amount</label>
 										<h:inputText id="PremiumAmount3" styleClass="form-control"
 											value="#{createInsuranceController.coverageOption3.premiumAmount}">
-											<f:convertNumber type="number" />
+											<f:convertNumber type="number" maxFractionDigits="2"
+												minFractionDigits="2" />
 										</h:inputText>
 										<br />
 										<h:message for="PremiumAmount3" styleClass="error-message" />
@@ -384,7 +394,8 @@
 										<label for="CoverageAmount3">Coverage Amount</label>
 										<h:inputText id="CoverageAmount3" styleClass="form-control"
 											value="#{createInsuranceController.coverageOption3.coverageAmount}">
-											<f:convertNumber type="number" />
+											<f:convertNumber type="number" maxFractionDigits="2"
+												minFractionDigits="2" />
 										</h:inputText>
 										<br />
 										<h:message for="CoverageAmount3" styleClass="error-message" />

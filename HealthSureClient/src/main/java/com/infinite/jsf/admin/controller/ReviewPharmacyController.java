@@ -141,21 +141,9 @@ public class ReviewPharmacyController {
 
 		int fromIndex = page * pageSize;
 		int toIndex = Math.min(fromIndex + pageSize, allPharmacies.size());
+
 		paginatedPharmacies = allPharmacies.subList(fromIndex, toIndex);
 	}
-
-//	public void sort(String field) {
-//	if (sortField.equals(field)) {
-//		ascending = !ascending;
-//	} else {
-//		sortField = field;
-//		ascending = true;
-//	}
-//	if (logger.isDebugEnabled()) {
-//		logger.debug("Sorting pharmacies by field: " + sortField + ", ascending: " + ascending);
-//	}
-//	sortAndPaginate();
-//}
 
 	/**
 	 * Sorts the list of entities (e.g., pharmacies, insurance plans, etc.) in
@@ -209,9 +197,13 @@ public class ReviewPharmacyController {
 	private int currentBlock = 0;
 
 	public List<Integer> getPageNumbers() {
+
 		List<Integer> pages = new ArrayList<>();
+
 		int totalPages = getTotalPages();
+
 		int startPage = currentBlock * pageBlockSize + 1;
+
 		int endPage = Math.min(startPage + pageBlockSize - 1, totalPages);
 
 		for (int i = startPage; i <= endPage; i++) {
@@ -235,6 +227,7 @@ public class ReviewPharmacyController {
 		int totalBlocks = (int) Math.ceil((double) totalPages / pageBlockSize);
 		if (currentBlock + 1 < totalBlocks) {
 			currentBlock++;
+			this.page = currentBlock * pageBlockSize;
 			sortAndPaginate();
 		}
 	}
@@ -243,6 +236,9 @@ public class ReviewPharmacyController {
 	public void previousBlock() {
 		if (currentBlock > 0) {
 			currentBlock--;
+			this.page = currentBlock * pageBlockSize;
+			
+
 			sortAndPaginate();
 		}
 	}
@@ -272,11 +268,10 @@ public class ReviewPharmacyController {
 			try {
 				reviewPharmacyaDao.updatePharmacyStatus(pharmacy, "ACCEPTED");
 			} catch (ReviewPharmacyException e) {
-				
+
 				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
 						ConstMessage.PHARMACY_UPDATE_ERROR.getMessage()));
 				return null;
-				
 
 			}
 

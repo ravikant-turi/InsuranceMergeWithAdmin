@@ -3,6 +3,7 @@ body {
 	padding: 40px;
 	margin: 0;
 	color: #2c3e50;
+	font-size: bold;
 }
 
 .table-container {
@@ -123,7 +124,7 @@ td {
 	margin-bottom: 20px;
 	text-align: center;
 	position: fixed;
-	top: 20px;
+	top: 50px;
 	left: 50%;
 	transform: translateX(-50%);
 	background-color: #0052cc;
@@ -165,4 +166,8 @@ th a, th a:visited {
 .status-REJECTED {
 	color: red;
 	font-weight: 500;
+}
+
+.summary-details {
+	font-size: 30px;
 }

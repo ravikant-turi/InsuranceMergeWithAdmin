@@ -265,7 +265,9 @@ table, th, td {
 						</h:panelGroup>
 					</h:panelGroup>
 				</f:facet>
-				<h:outputText value="#{plan.availableCoverAmounts}" />
+				<h:outputText value="#{plan.availableCoverAmounts}">
+					<f:convertNumber pattern="0.00" />
+				</h:outputText>
 			</h:column>
 
 			<!-- Waiting Period -->

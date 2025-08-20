@@ -342,6 +342,10 @@
 						styleClass="action-button" />
 				</div>
 				 -->
+				<div>
+					<h:outputText styleClass="summary-details"
+						value="Showing #{(reviewPharmacyController.page+1)*reviewPharmacyController.pageSize} out of #{reviewPharmacyController.totalPages*reviewPharmacyController.pageSize} Result" />
+				</div>
 			</div>
 
 		</h:form>
