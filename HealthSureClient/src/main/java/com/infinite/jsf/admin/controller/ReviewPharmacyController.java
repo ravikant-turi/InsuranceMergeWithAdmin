@@ -1,7 +1,6 @@
 /**
  * Copyright © 2025 Infinite Computer Solution. All rights reserved.
  */
-
 /**
  * This package contains controller classes for managing administrative operations in the JSF-based application,
  * including pharmacy review, approval workflows, navigation, and integration with pharmacy modules.
@@ -52,8 +51,17 @@ public class ReviewPharmacyController {
 	private DispensedEquipments dispensedEquipments;
 	private Passwords passwords;
 	private Pharmacy selectedPharmacy;
-//	private List<Pharmacy> pharmaciesList;
 	private String showValidatinMessage;
+
+	/**
+	 * Mail Validations Message Custimaizations
+	 */
+	private String gstNoValidationMessag;
+	private boolean isGstNoValid;
+	private String licenseValidationMessage;
+	private boolean isLicenseValid;
+	private String adharValidationMessage;
+	private boolean isAdharValid;
 
 	private static final Logger logger = Logger.getLogger(ReviewPharmacyController.class);
 
@@ -237,7 +245,6 @@ public class ReviewPharmacyController {
 		if (currentBlock > 0) {
 			currentBlock--;
 			this.page = currentBlock * pageBlockSize;
-			
 
 			sortAndPaginate();
 		}
@@ -506,11 +513,5 @@ public class ReviewPharmacyController {
 	public static Logger getLogger() {
 		return logger;
 	}
-//	public List<Pharmacy> getPharmaciesList() {
-//	return pharmaciesList;
-//}
-//
-//public void setPharmaciesList(List<Pharmacy> pharmaciesList) {
-//	this.pharmaciesList = pharmaciesList;
-//}
+
 }

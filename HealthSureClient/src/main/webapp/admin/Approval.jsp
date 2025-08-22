@@ -297,7 +297,7 @@
 				<div style="display: flex; align-items: center;">
 
 					<!-- Row Previous Button -->
-					<h:commandButton value="Prev Pages" title="Prev row"
+					<h:commandButton value="Previous" title="Prev row"
 						action="#{reviewPharmacyController.previousBlock}"
 						disabled="#{reviewPharmacyController.currentBlock eq 0}"
 						style="margin-right: 8px;" styleClass="action-button" />
@@ -313,7 +313,7 @@
 					</h:dataTable>
 
 					<!-- Row Next Button -->
-					<h:commandButton value="Next Pages" title="Next row"
+					<h:commandButton value="Next" title="Next row"
 						action="#{reviewPharmacyController.nextBlock}"
 						disabled="#{reviewPharmacyController.currentBlock + 1 ge (reviewPharmacyController.totalPages / reviewPharmacyController.pageBlockSize)}"
 						style="margin-left: 8px;" styleClass="action-button" />

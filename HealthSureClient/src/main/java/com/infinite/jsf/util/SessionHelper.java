@@ -34,8 +34,8 @@ public class SessionHelper {
 
 
 			// Add these lines to disable Bean Validation
-//			config.setProperty("hibernate.validator.apply_to_ddl", "false");
-//			config.setProperty("hibernate.validator.autoregister_listeners", "false");
+			config.setProperty("hibernate.validator.apply_to_ddl", "false");
+			config.setProperty("hibernate.validator.autoregister_listeners", "false");
 
 			sessionFactory = config.buildSessionFactory();
 			if (logger.isDebugEnabled()) {
