@@ -35,14 +35,7 @@ public interface ReviewPharmacyaDao {
 	 */
 	List<Pharmacy> reviewPharmacyDetails() throws ReviewPharmacyException;
 
-	/**
-	 * Searches for a pharmacy by its unique ID.
-	 *
-	 * @param pharmacyId the ID of the pharmacy to search
-	 * @return Pharmacy object if found, otherwise null
-	 */
-	Pharmacy searchPharmacyById(String pharmacyId);
-
+	
 	/**
 	 * Updates the status of a pharmacy (e.g., ACCEPTED or REJECTED).
 	 *
@@ -52,4 +45,5 @@ public interface ReviewPharmacyaDao {
 	 * @throws ReviewPharmacyException 
 	 */
 	String updatePharmacyStatus(Pharmacy pharmacy, String status) throws ReviewPharmacyException;
+	
 }

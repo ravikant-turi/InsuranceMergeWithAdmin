@@ -171,3 +171,9 @@ th a, th a:visited {
 .summary-details {
 	font-size: 17px;
 }
+.first-heading{
+	display: flex;
+	justify-content: space-between;
+	
+	
+}

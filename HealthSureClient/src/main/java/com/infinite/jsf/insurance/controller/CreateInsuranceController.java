@@ -76,12 +76,20 @@ public class CreateInsuranceController {
 	private List<MemberPlanRule> members;
 	private List<InsurancePlan> planList;
 	private Map<String, Boolean> relationMap = new HashMap<>();
-	List<String> selectedRelations = new ArrayList<String>();
+	private List<String> selectedRelations = new ArrayList<String>();
 	private boolean isSilver = true;
 	private boolean isGold = false;
 	private boolean isPlatinum = false;
+	private String planAvailableCoverAmountStr;
+	private String silverPremiumAmountStr;
+	private String silverCoverageAmountStr;
+	private String goldPremiumAmountStr;
+	private String goldCoverageAmountStr;
+	private String platinumPremiumAmountStr;
+	private String platinumCoverageAmountStr;
+
 	private String individualMemberGender;
-	CreateInsuranceMessageConstants validationMessages = new CreateInsuranceMessageConstants();
+	private CreateInsuranceMessageConstants validationMessages = new CreateInsuranceMessageConstants();
 	private InsuranceCompanyDao companyDao = new InsuranceCompanyDaoImpl();
 	private static final Logger logger = Logger.getLogger(InsuranceCompanyDaoImpl.class);
 
@@ -242,7 +250,7 @@ public class CreateInsuranceController {
 	 */
 
 	public String addSilverOnlyMendatory() {
-
+		prepareObject();
 		FacesContext context = FacesContext.getCurrentInstance();
 		logger.info("Prepare insurance plan");
 		// Prepare insurance plan
@@ -398,6 +406,47 @@ public class CreateInsuranceController {
 		}
 
 		return "insuranceAdminDashBoard";
+	}
+
+	public void prepareObject() {
+		Double coverAmount = validateAndParseDouble(planAvailableCoverAmountStr, "companyForm:cover");
+		if (coverAmount != null) {
+
+			insurancePlan.setAvailableCoverAmounts(coverAmount);
+		}
+
+		if (isSilver) {
+			logger.info("validate silverOptions " + silverPremiumAmountStr);
+			logger.info("validate silverOptions " + silverCoverageAmountStr);
+
+			Double silverPremium = validateAndParseDouble(silverPremiumAmountStr, "companyForm:PremiumAmount");
+			Double silverCoverage = validateAndParseDouble(silverCoverageAmountStr, "companyForm:CoverageAmount");
+
+			if (silverPremium != null)
+				coverageOption1.setPremiumAmount(silverPremium);
+			if (silverCoverage != null)
+				coverageOption1.setCoverageAmount(silverCoverage);
+		}
+
+		if (isGold) {
+			Double goldPremium = validateAndParseDouble(goldPremiumAmountStr, "companyForm:PremiumAmount2");
+			Double goldCoverage = validateAndParseDouble(goldCoverageAmountStr, "companyForm:CoverageAmount2");
+
+			if (goldPremium != null)
+				coverageOption2.setPremiumAmount(goldPremium);
+			if (goldCoverage != null)
+				coverageOption2.setCoverageAmount(goldCoverage);
+		}
+
+		if (isPlatinum) {
+			Double platinumPremium = validateAndParseDouble(platinumPremiumAmountStr, "companyForm:PremiumAmount3");
+			Double platinumCoverage = validateAndParseDouble(platinumCoverageAmountStr, "companyForm:CoverageAmount3");
+
+			if (platinumPremium != null)
+				coverageOption3.setPremiumAmount(platinumPremium);
+			if (platinumCoverage != null)
+				coverageOption3.setCoverageAmount(platinumCoverage);
+		}
 	}
 
 	/**
@@ -776,6 +825,70 @@ public class CreateInsuranceController {
 		this.sortAscending = sortAscending;
 	}
 
+	public String getPlanAvailableCoverAmountStr() {
+		return planAvailableCoverAmountStr;
+	}
+
+	public void setPlanAvailableCoverAmountStr(String planAvailableCoverAmountStr) {
+		this.planAvailableCoverAmountStr = planAvailableCoverAmountStr;
+	}
+
+	public String getSilverPremiumAmountStr() {
+		return silverPremiumAmountStr;
+	}
+
+	public void setSilverPremiumAmountStr(String silverPremiumAmountStr) {
+		this.silverPremiumAmountStr = silverPremiumAmountStr;
+	}
+
+	public String getSilverCoverageAmountStr() {
+		return silverCoverageAmountStr;
+	}
+
+	public void setSilverCoverageAmountStr(String silverCoverageAmountStr) {
+		this.silverCoverageAmountStr = silverCoverageAmountStr;
+	}
+
+	public String getGoldPremiumAmountStr() {
+		return goldPremiumAmountStr;
+	}
+
+	public void setGoldPremiumAmountStr(String goldPremiumAmountStr) {
+		this.goldPremiumAmountStr = goldPremiumAmountStr;
+	}
+
+	public String getGoldCoverageAmountStr() {
+		return goldCoverageAmountStr;
+	}
+
+	public void setGoldCoverageAmountStr(String goldCoverageAmountStr) {
+		this.goldCoverageAmountStr = goldCoverageAmountStr;
+	}
+
+	public String getPlatinumPremiumAmountStr() {
+		return platinumPremiumAmountStr;
+	}
+
+	public void setPlatinumPremiumAmountStr(String platinumPremiumAmountStr) {
+		this.platinumPremiumAmountStr = platinumPremiumAmountStr;
+	}
+
+	public String getPlatinumCoverageAmountStr() {
+		return platinumCoverageAmountStr;
+	}
+
+	public void setPlatinumCoverageAmountStr(String platinumCoverageAmountStr) {
+		this.platinumCoverageAmountStr = platinumCoverageAmountStr;
+	}
+
+	public InsuranceCompanyDao getCompanyDao() {
+		return companyDao;
+	}
+
+	public void setCompanyDao(InsuranceCompanyDao companyDao) {
+		this.companyDao = companyDao;
+	}
+
 	@PostConstruct
 	public void init() {
 		FacesContext context = FacesContext.getCurrentInstance();
@@ -902,6 +1015,7 @@ public class CreateInsuranceController {
 			isValid = false;
 		}
 		// 4.AvailableCoverAmounts
+
 		Double coverAmount = plan.getAvailableCoverAmounts();
 		if (coverAmount == null) {
 			context.addMessage("companyForm:cover",
@@ -1110,9 +1224,17 @@ public class CreateInsuranceController {
 			context.addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.LINKED_PLAN_REQUIRED, null));
 			isValid = false;
+			return false;
+		}
+		if (!isSilver) {
+			context.addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Must select silver Options ", null));
+			isValid = false;
+			return false;
 		}
 
-		// Validate premiumAmount
+		logger.info(silverOption.getPremiumAmount() + "silve set options" + silverOption.getCoverageAmount());
+		logger.info(coverageOption1.getPremiumAmount() + "silve set options" + coverageOption1.getCoverageAmount());
 		if (silverOption.getPremiumAmount() < 500 || silverOption.getPremiumAmount() > 100000) {
 			context.addMessage("companyForm:PremiumAmount",
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.PREMIUM_AMOUNT_RANGE, null));
@@ -1120,6 +1242,7 @@ public class CreateInsuranceController {
 		}
 
 		// Validate coverageAmount
+
 		if (silverOption.getCoverageAmount() < 100000 || silverOption.getCoverageAmount() > 50000000) {
 			context.addMessage("companyForm:CoverageAmount",
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.COVERAGE_AMOUNT_RANGE, null));
@@ -1155,11 +1278,19 @@ public class CreateInsuranceController {
 		boolean isValid = true;
 
 		// Validate plan
+		if (!isGold) {
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Must select gold Options ", null));
+			isValid = false;
+			return false;
+		}
 		if (goldOption.getInsurancePlan() == null || goldOption.getInsurancePlan() == null) {
 			context.addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.LINKED_PLAN_REQUIRED, null));
 			isValid = false;
+			return false;
 		}
+		logger.info("Here we are and gold Options " + goldCoverageAmountStr);
+		logger.info("Here we are and gold Options " + goldPremiumAmountStr);
 
 		// Validate premiumAmount
 		if (goldOption.getPremiumAmount() < 500 || goldOption.getPremiumAmount() > 100000) {
@@ -1193,6 +1324,7 @@ public class CreateInsuranceController {
 			context.addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, validationMessages.LINKED_PLAN_REQUIRED, null));
 			isValid = false;
+			return false;
 		}
 
 		// Validate premiumAmount
@@ -1388,6 +1520,48 @@ public class CreateInsuranceController {
 
 		return isValid;
 
+	}
+
+	public Double validateAndParseDouble(String value, String inputComponentId) {
+		FacesContext context = FacesContext.getCurrentInstance();
+		logger.info(" validateAndParseDouble is called ---------------" + value);
+
+		if (value == null) {
+			context.addMessage(inputComponentId,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Value should not be null.", null));
+			return null;
+		}
+
+		if (value.trim().isEmpty()) {
+			context.addMessage(inputComponentId,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Value should not be empty.", null));
+			return null;
+		}
+		logger.info("---------------" + value);
+//		if (!value.matches("^\\d+(\\.\\d+)?$")) {
+		if (!value.matches("^-?\\d+(\\.\\d+)?$")) {
+			context.addMessage(inputComponentId, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+					"Value should contain only numeric or decimal digits.", null));
+			return null;
+		}
+		logger.info("---------------" + value);
+
+		try {
+			logger.info("--------------" + value);
+			double parsedValue = Double.parseDouble(value);
+			if (parsedValue < 0) {
+				context.addMessage(inputComponentId,
+						new FacesMessage(FacesMessage.SEVERITY_ERROR, "Value should not be negative.", null));
+				return null;
+			}
+			return parsedValue;
+		} catch (NumberFormatException e) {
+			logger.info("---------------" + value);
+
+			context.addMessage(inputComponentId,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Invalid number format.", null));
+			return null;
+		}
 	}
 
 	public void resetAll() {

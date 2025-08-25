@@ -7,6 +7,7 @@
  * This package contains the implementation classes for DAO (Data Access Object)
  * related to the insurance module 
  */
+
 package com.infinite.jsf.insurance.daoImpl;
 
 import java.util.Date;
@@ -14,22 +15,15 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
-import org.hibernate.NonUniqueResultException;
-import org.hibernate.ObjectNotFoundException;
-import org.hibernate.QueryTimeoutException;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.StaleStateException;
 import org.hibernate.Transaction;
-import org.hibernate.exception.JDBCConnectionException;
-import org.hibernate.exception.SQLGrammarException;
 
 import com.infinite.jsf.insurance.dao.InsurancePlanDao;
 import com.infinite.jsf.insurance.exception.InsurancePlanException;
 import com.infinite.jsf.insurance.model.InsurancePlan;
 import com.infinite.jsf.util.SessionHelper;
-
-import jakarta.validation.ConstraintViolationException;
 
 /**
  *

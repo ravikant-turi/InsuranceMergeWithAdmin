@@ -8,6 +8,8 @@
  */
 package com.infinite.jsf.admin.daoImpl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -92,43 +94,8 @@ public class ReviewPharmacyaDaoImpl implements ReviewPharmacyaDao {
 				session.close();
 		}
 
+		System.out.println("---------------------method is called");
 		return pharmacies;
-	}
-
-	/**
-	 * Searches for a pharmacy by its ID.
-	 *
-	 * @param pharmacyId the ID of the pharmacy
-	 * @return Pharmacy object if found
-	 */
-	@Override
-	public Pharmacy searchPharmacyById(String pharmacyId) {
-		Pharmacy pharmacy = null;
-		Transaction trans = null;
-
-		try {
-			session = factory.openSession();
-			trans = session.beginTransaction();
-
-			pharmacy = (Pharmacy) session.get(Pharmacy.class, pharmacyId);
-
-			trans.commit();
-
-			if (logger.isDebugEnabled()) {
-				logger.debug("Pharmacy found with ID: " + pharmacyId);
-			}
-		} catch (Exception e) {
-			if (trans != null)
-				trans.rollback();
-
-			logger.error("Error searching pharmacy by ID: " + pharmacyId, e);
-
-		} finally {
-			if (session != null)
-				session.close();
-		}
-
-		return pharmacy;
 	}
 
 	/**
@@ -188,4 +155,5 @@ public class ReviewPharmacyaDaoImpl implements ReviewPharmacyaDao {
 
 		return "error";
 	}
+
 }

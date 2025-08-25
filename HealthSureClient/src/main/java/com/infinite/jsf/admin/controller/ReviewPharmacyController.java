@@ -11,11 +11,10 @@ package com.infinite.jsf.admin.controller;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-
 import org.apache.log4j.Logger;
-
 import com.infinite.jsf.admin.dao.ReviewPharmacyaDao;
 import com.infinite.jsf.admin.daoImpl.ReviewPharmacyaDaoImpl;
 import com.infinite.jsf.admin.exception.ReviewPharmacyException;
@@ -52,6 +51,7 @@ public class ReviewPharmacyController {
 	private Passwords passwords;
 	private Pharmacy selectedPharmacy;
 	private String showValidatinMessage;
+	private List<Pharmacy> allPharmacies;
 
 	/**
 	 * Mail Validations Message Custimaizations
@@ -67,18 +67,6 @@ public class ReviewPharmacyController {
 
 	public ReviewPharmacyController() {
 
-		FacesContext context = FacesContext.getCurrentInstance();
-		if (logger.isDebugEnabled()) {
-			logger.debug("Fetching all pharmacies for review.");
-		}
-		try {
-			allPharmacies = reviewPharmacyaDao.reviewPharmacyDetails();
-		} catch (ReviewPharmacyException e) {
-			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error : ",
-					"Error accured while fetchig the pharamcy Data"));
-
-		}
-		sortAndPaginate();
 	}
 
 	/**
@@ -88,19 +76,31 @@ public class ReviewPharmacyController {
 	 *
 	 * @return List of Pharmacy objects pending review.
 	 */
+	@PostConstruct
+	public void init() {
 
-//	public List<Pharmacy> showPharmacyAllForReview() {
-//		if (logger.isDebugEnabled()) {
-//			logger.debug("Fetching all pharmacies for review.");
-//		}
-//		pharmaciesList = reviewPharmacyaDao.reviewPharmacyDetails();
-//		return pharmaciesList;
-//	}
+		showPharmacyAllForReview(); // Safe to call here
+
+	}
+
+	public List<Pharmacy> showPharmacyAllForReview() {
+		if (logger.isDebugEnabled()) {
+			logger.debug("Fetching all pharmacies for review.");
+		}
+		try {
+			allPharmacies = reviewPharmacyaDao.reviewPharmacyDetails();
+			logger.info("================== : " + allPharmacies.size());
+		} catch (ReviewPharmacyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		sortAndPaginate();
+		return allPharmacies;
+	}
 
 	/*
 	 * PAGINATION AND SORTING
 	 */
-	private List<Pharmacy> allPharmacies;
 	private List<Pharmacy> paginatedPharmacies;
 	private int page = 0;
 	private int pageSize = 3;
@@ -122,6 +122,7 @@ public class ReviewPharmacyController {
 	}
 
 	private void sortAndPaginate() {
+
 		Comparator<Pharmacy> comparator = Comparator.comparing(p -> {
 			switch (sortField) {
 			case "pharmacyName":
@@ -188,6 +189,7 @@ public class ReviewPharmacyController {
 	public void sortByDesc(String field) {
 		if (!field.equals(sortField) || ascending) {
 			// If this is a new field or the current order is ascending, update sort
+			logger.info("");
 			sortField = field;
 			ascending = false;
 			if (logger.isDebugEnabled()) {
@@ -265,42 +267,30 @@ public class ReviewPharmacyController {
 		FacesContext context = FacesContext.getCurrentInstance();
 
 		if ("ACCEPTED".equals(pharmacy.getStatus())) {
-			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-					pharmacy.getPharmacyId() + " " + ConstMessage.APPROVED_SUCCESSFULLY.getMessage(), null));
+			String message = pharmacy.getPharmacyId() + " " + ConstMessage.APPROVED_SUCCESSFULLY.getMessage();
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, message, null));
 			return null;
 		}
 
-		if (validatePharmacyDetails(pharmacy)) {
+		boolean isValid = validatePharmacyDetails(pharmacy);
+		String newStatus = isValid ? "ACCEPTED" : "REJECTED";
 
-			try {
-				reviewPharmacyaDao.updatePharmacyStatus(pharmacy, "ACCEPTED");
-			} catch (ReviewPharmacyException e) {
+		try {
+			reviewPharmacyaDao.updatePharmacyStatus(pharmacy, newStatus);
+		} catch (ReviewPharmacyException e) {
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error:",
+					ConstMessage.PHARMACY_UPDATE_ERROR.getMessage()));
+			return null;
+		}
 
-				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error :",
-						ConstMessage.PHARMACY_UPDATE_ERROR.getMessage()));
-				return null;
+		String message = pharmacy.getPharmacyId() + " " + ConstMessage.APPROVED_SUCCESSFULLY.getMessage();
+		showValidatinMessage = message;
 
-			}
-
-			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-					pharmacy.getPharmacyId() + " " + ConstMessage.APPROVED_SUCCESSFULLY.getMessage(), null));
-
-			showValidatinMessage = pharmacy.getPharmacyId() + " " + ConstMessage.APPROVED_SUCCESSFULLY.getMessage();
-
+		if (isValid) {
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, message, null));
 		} else {
-
-			try {
-				reviewPharmacyaDao.updatePharmacyStatus(pharmacy, "REJECTED");
-			} catch (ReviewPharmacyException e) {
-				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error:",
-						ConstMessage.PHARMACY_UPDATE_ERROR.getMessage()));
-				return null;
-			}
-
 			String htmlContent = String.format(ConstMessage.REJECTED_HTML_TEMPLATE.getMessage(), showValidatinMessage);
-
 			MailSend.sendInfo(pharmacy.getEmail(), ConstMessage.REJECTED_SUBJECT.getMessage(), htmlContent);
-
 		}
 
 		return null;
@@ -361,7 +351,11 @@ public class ReviewPharmacyController {
 	 */
 
 	public int getTotalPages() {
-		return (int) Math.ceil((double) allPharmacies.size() / pageSize);
+		if (allPharmacies != null) {
+
+			return (int) Math.ceil((double) allPharmacies.size() / pageSize);
+		}
+		return 0;
 	}
 
 //	GETTER AND STTER
@@ -491,6 +485,7 @@ public class ReviewPharmacyController {
 	}
 
 	public List<Pharmacy> getPaginatedPharmacies() {
+
 		return paginatedPharmacies;
 	}
 
@@ -512,6 +507,11 @@ public class ReviewPharmacyController {
 
 	public static Logger getLogger() {
 		return logger;
+	}
+
+	public void reset() {
+		page = 0;
+		sortAndPaginate();
 	}
 
 }

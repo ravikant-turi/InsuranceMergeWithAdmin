@@ -1,0 +1,716 @@
+-- Create the database
+-- drop database healthsure;
+CREATE DATABASE IF NOT EXISTS healthsure;
+
+USE healthsure;
+
+-- ===========================
+-- 1. Admin_User Table (Admin Users)
+-- ===========================
+CREATE TABLE Admin_User (
+    user_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    user_name VARCHAR(255) NOT NULL UNIQUE, -- Used for login
+    password VARCHAR(255) NOT NULL, -- Hashed password
+    email VARCHAR(255) NOT NULL UNIQUE, -- Used for OTP verification
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+           ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+-- ===========================
+-- 1. OTP Table (Admin Users)
+-- ===========================
+CREATE TABLE Admin_Otp (
+    otp_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(150) NOT NULL,
+    otp_code VARCHAR(10) NOT NULL,
+    reason ENUM('SIGNUP', 'FORGOT_PASSWORD') NOT NULL,
+    status ENUM('INACTIVE', 'ACTIVE', 'EXPIRED') NOT NULL DEFAULT 'ACTIVE',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at DATETIME NOT NULL
+);
+
+-- ===========================
+-- 1. Admin_Password_History Table (Admin Users)
+-- ===========================
+CREATE TABLE Admin_Password_History (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    changed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Admin_User(user_id)
+);
+
+-- Ishani Table
+
+-- Table: providers (Hospitals)
+CREATE TABLE Providers (
+    provider_id VARCHAR(20) PRIMARY KEY,
+    provider_name VARCHAR(100) NOT NULL,
+    hospital_name VARCHAR(100) NOT NULL,
+    telephone VARCHAR(20),
+    email VARCHAR(100)  NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    address VARCHAR(225),
+    city VARCHAR(225),
+    state VARCHAR(225),
+    zipcode VARCHAR(225),
+    status ENUM('PENDING', 'APPROVED', 'REJECTED') DEFAULT 'PENDING',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO providers (
+    provider_id, provider_name, hospital_name, telephone, email, password,
+    address, city, state, zipcode, status
+)
+VALUES
+('PROV001', 'HealthCorp', 'City Hospital', '1234567890', 'ishanimishra1004@gmail.com', 'password1', '123 Main St', 'New York', 'NY', '100701', 'PENDING'),
+('PROV002', 'MediCare', 'MediCare Hospital', '2345678901', 'medicare@example.com', 'password2', '456 Oak St', 'Los Angeles', 'CA', '907001', 'PENDING'),
+('PROV003', 'CarePlus', 'CarePlus Health Center', '3456789012', 'careplus@example.com', 'password3', '789 Pine St', 'Chicago', 'IL', '650001', 'PENDING'),
+('PROV004', 'BestMed', 'BestMed Clinic', '9178587188', 'ishh0211@gmail.com', 'password4', '123 Birch St', 'San Francisco', 'CA', '94417', 'PENDING'),
+('PROV005', 'WellnessNow', 'WellnessNow Hospital', '5678901234', 'ishh0215@gmail.com', 'password5', '321 Maple St', 'Houston', 'TX', '770011', 'PENDING'),
+('PROV006', 'PrimeCare', 'PrimeCare Medical', '6789012345', 'primecare@example.com', 'password6', '654 Cedar St', 'Dallas', 'TX', '75201', 'PENDING'),
+('PROV007', 'CureAll', 'CureAll Health', '7890123456', 'ishh0217@gmail.com', 'password7', '987 Elm St', 'Miami', 'FL', '33101', 'PENDING'),
+('PROV008', 'GlobalMed', 'GlobalMed Hospital', '8901234567', 'globalmed@example.com', 'password8', '246 Walnut St', 'Boston', 'MA', '02101', 'PENDING'),
+('PROV009', 'HealthWay', 'HealthWay Clinic', '9012345678', 'ishanimishra1006@gmail.com', 'password9', '135 Chestnut St', 'Seattle', 'WA', '98101', 'PENDING'),
+('PROV010', 'CareLink', 'CareLink Health', '0123456789', 'carelink@example.com', 'password10', '864 Ash St', 'Atlanta', 'GA', '30301', 'PENDING'),
+('PROV011', 'HealthCare Solutions', 'City General Hospital', '5558781234', 'contact@healthcaresolutions.com', 'hashed_password_1', '123 Health St', 'New York', 'NY', '10001', 'PENDING'),
+('PROV012', 'MediServe', 'MediServe Medical Center', '5558905678', 'support@mediserve.com', 'hashed_password_2', '456 Wellness Ave', 'Los Angeles', 'CA', '90001', 'PENDING'),
+('PROV013', 'CarePlus Providers', 'CarePlus Hospital', '5553459101', 'ishh0219@gmail.com', 'hashed_password_3', '789 Care Ln', 'Chicago', 'IL', '60601', 'PENDING'),
+('PROV014', 'WellnessFirst', 'WellnessFirst Clinic', '5552211122', 'ishh0212@gmail.com', 'hashed_password_4', '321 Health Blvd', 'San Francisco', 'CA', '941010', 'PENDING'),
+('PROV015', 'VitalHealth', 'VitalHealth Medical Group', '5557898765', 'support@vitalhealth.com', 'hashed_password_5', '654 Health Ave', 'Dallas', 'TX', '75201', 'PENDING');
+CREATE TABLE provider_password_history (
+  password_id int AUTO_INCREMENT PRIMARY KEY,
+  provider_id VARCHAR(50) NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP NOT NULL,
+  FOREIGN KEY (provider_id) REFERENCES Providers(provider_id)
+);
+
+-- Table: doctors 
+
+CREATE TABLE Doctors (
+	doctor_id VARCHAR(20) PRIMARY KEY,
+    provider_id VARCHAR(20),
+    doctor_name VARCHAR(100) NOT NULL,
+    qualification VARCHAR(255),
+    specialization VARCHAR(100),
+    license_no VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    address VARCHAR(225) NOT NULL,
+    phone_number VARCHAR(20),
+    gender ENUM('MALE','FEMALE') NOT NULL,
+    type ENUM('STANDARD', 'ADHOC') DEFAULT 'STANDARD',
+    doctor_status ENUM('ACTIVE', 'INACTIVE','ON_LEAVE') DEFAULT 'ACTIVE',
+    status VARCHAR(20),
+    FOREIGN KEY (provider_id) REFERENCES Providers(provider_id)
+);
+-- To send
+CREATE TABLE Accounts (
+    account_id INT PRIMARY KEY AUTO_INCREMENT,
+    provider_id VARCHAR(20),
+    bank_name VARCHAR(100),
+    ifsc_code VARCHAR(11),
+    account_number VARCHAR(20),
+    FOREIGN KEY (provider_id) REFERENCES Providers(provider_id)
+);
+
+-- To send
+CREATE TABLE Provider_Otp (
+    otp_id INT PRIMARY KEY AUTO_INCREMENT,
+	email VARCHAR(100) UNIQUE NOT NULL,
+    otp_code VARCHAR(10) NOT NULL,
+	reason ENUM('SIGNUP', 'LOGIN', 'FORGOT') NOT NULL,
+    created_at TimeStamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at TimeStamp NULL,
+    is_verified BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (email) REFERENCES Providers(email)
+);
+
+-- To send
+CREATE TABLE Doctor_availability (
+    availability_id VARCHAR(36) PRIMARY KEY,
+    doctor_id VARCHAR(36) NOT NULL,
+    available_date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    slot_type ENUM('STANDARD', 'ADHOC') DEFAULT 'STANDARD',
+    total_slots INT NOT NULL,
+    patient_window INT GENERATED ALWAYS AS (
+    TIMESTAMPDIFF(MINUTE, start_time, end_time) / total_slots
+	) STORED,
+    is_recurring BOOLEAN DEFAULT FALSE,
+    notes VARCHAR(255),
+    available_status ENUM('ACTIVE', 'INACTIVE') DEFAULT 'ACTIVE',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (doctor_id) REFERENCES Doctors(doctor_id)
+);
+
+
+INSERT INTO Doctors (
+    doctor_id, provider_id, doctor_name, qualification, specialization,
+    license_no, email, address, phone_number, gender, type, doctor_status
+)
+VALUES
+('DOC001', 'PROV001', 'Dr. John Smith', 'MD', 'Cardiology', 'MH/2023/00001/P', 'drjohnsmith@example.com', '123 Health St', '7654321765', 'MALE', 'STANDARD', 'ACTIVE'),
+('DOC002', 'PROV001', 'Dr. Sarah Lee', 'MBBS', 'Pediatrics', 'MH/2023/00002/P', 'drsarahlee@example.com', '124 Health St', '9876543212', 'FEMALE', 'STANDARD', 'ACTIVE'),
+('DOC003', 'PROV002', 'Dr. Smitha', 'MBBS', 'Orthopedics', 'MH/2023/00003/P', 'dremmabrown@example.com', '456 Oak St', '6543212345', 'FEMALE', 'STANDARD', 'ACTIVE'),
+('DOC004', 'PROV002', 'Dr. William Harris', 'MD', 'Neurology', 'MH/2023/00004/P', 'drwilliamharris@example.com', '457 Oak St', '9876543219', 'MALE', 'STANDARD', 'ACTIVE'),
+('DOC005', 'PROV003', 'Dr. Olivia Green', 'DO', 'Dermatology', 'MH/2023/00005/P', 'droliviagreen@example.com', '789 Pine St', '9876543213', 'FEMALE', 'ADHOC', 'INACTIVE'),
+('DOC006', 'PROV003', 'Dr. Michael Davis', 'BAMS', 'General Medicine', 'MH/2023/00006/P', 'drmichaeldavis@example.com', '790 Pine St', '7776543212', 'MALE', 'ADHOC', 'INACTIVE'),
+('DOC007', 'PROV004', 'Dr. Daniel Carter', 'MBBS', 'Cardiology', 'MH/2023/00007/P', 'drdanielcarter@example.com', '123 Birch St', '9876000212', 'MALE', 'STANDARD', 'ACTIVE'),
+('DOC008', 'PROV004', 'Dr. Emily Wright', 'BDS', 'Ophthalmology', 'MH/2023/00008/P', 'dremilywright@example.com', '124 Birch St', '9855443212', 'FEMALE', 'STANDARD', 'ACTIVE'),
+('DOC009', 'PROV005', 'Dr. James Scott', 'MD', 'Psychiatry', 'MH/2023/00009/P', 'drjamesscott@example.com', '321 Maple St', '9231043212', 'MALE', 'ADHOC', 'INACTIVE'),
+('DOC010', 'PROV005', 'Dr. Laura Miller', 'MBBS', 'General Surgery', 'MH/2023/00010/P', 'drlauramiller@example.com', '322 Maple St', '8086543212', 'FEMALE', 'ADHOC', 'INACTIVE'),
+('DOC011', 'PROV001', 'Dr. Radhika', 'MD', 'Cardiology', 'MH/2023/00011/P', 'radhika@google.com', '123 Health St, New York', '5555561234', 'MALE', 'STANDARD', 'ACTIVE'),
+('DOC012', 'PROV002', 'Dr. Aishradha Khanna', 'MBBS', 'Dermatology', 'MH/2023/00012/P', 'aishrad@gmail.com', '456 Wellness Ave, Los Angeles', '9178505678', 'FEMALE', 'STANDARD', 'ACTIVE'),
+('DOC013', 'PROV013', 'Dr. Ishani Mitra', 'MD', 'Orthopedics', 'MH/2023/00013/P', 'ishanimitra@gmail.com', '789 Care Ln, Chicago', '7077505678', 'MALE', 'ADHOC', 'INACTIVE'),
+('DOC014', 'PROV014', 'Dr. Subh Dash', 'MBBS', 'Pediatrics', 'MH/2023/00014/P', 'subh@wellnessfirst.com', '321 Health Blvd, San Francisco', '8890505678', 'FEMALE', 'STANDARD', 'ACTIVE'),
+('DOC015', 'PROV015', 'Dr. Ishani Mishra', 'MD', 'Neurology', 'MH/2023/00015/P', 'ishh0212@gmail.com', '654 Health Ave, Dallas', '9091205678', 'MALE', 'ADHOC', 'INACTIVE');
+
+-- Usha Table
+
+-- Table: Recipient
+CREATE TABLE Recipient (
+    h_id VARCHAR(20) PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    mobile VARCHAR(10) NOT NULL,
+    user_name VARCHAR(100) UNIQUE NOT NULL,
+    gender ENUM('MALE', 'FEMALE') NOT NULL,
+    dob DATE NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_modified_at TIMESTAMP NULL DEFAULT NULL, -- Will be NULL until first update
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    status ENUM('ACTIVE', 'INACTIVE', 'BLOCKED') DEFAULT 'ACTIVE',
+    login_attempts INT DEFAULT 0,
+    locked_until DATETIME DEFAULT NULL,
+    last_login DATETIME DEFAULT NULL,
+    password_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+ 
+ CREATE TABLE Recipient_Otp (
+    otp_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_name VARCHAR(100) UNIQUE NOT NULL,
+    otp_code INT NOT NULL,
+    new_password VARCHAR(255),
+    status ENUM('PENDING', 'VERIFIED', 'EXPIRED') DEFAULT 'PENDING',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at DATETIME NOT NULL,
+    purpose ENUM('REGISTER','FORGOT_PASSWORD','RESEND_OTP') NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    CONSTRAINT fk_user FOREIGN KEY (user_name) REFERENCES recipient(user_name) ON DELETE CASCADE
+);
+ INSERT INTO Recipient (h_id, first_name, last_name, mobile, user_name, gender, dob, address, password, email, status, login_attempts, created_at) VALUES
+('HID001', 'Alice', 'Smith', '9876543210', 'alice_smith', 'FEMALE', '2000-01-01', '123 Main St, Delhi', 'alice@123', 'alice@example.com', 'ACTIVE', 0, '2025-07-02 10:15:00'),
+('HID002', 'Albert', 'Johnson', '9876543211', 'albert_j', 'MALE', '2000-02-15', '45 Park Lane, Mumbai', 'albert@123', 'albert@example.com', 'ACTIVE', 0, '2025-07-03 09:20:00'),
+('HID003', 'Gabriel', 'Davis', '9876543212', 'gabriel_d', 'MALE', '2001-03-20', '78 River Rd, Chennai', 'gabriel@123', 'gabriel@example.com', 'ACTIVE', 0, '2025-07-04 11:45:00'),
+('HID004', 'James', 'Miller', '9876543213', 'james_m', 'MALE', '2000-04-25', '66 Hilltop, Kolkata', 'james@123', 'james@example.com', 'ACTIVE', 0, '2025-07-05 14:10:00'),
+('HID005', 'Thomas', 'Wilson', '9876543214', 'thomas_w', 'MALE', '1995-05-10', '92 Lake View, Hyderabad', 'thomas@123', 'thomas@example.com', 'ACTIVE', 0, '2025-07-06 16:30:00'),
+('HID006', 'Mary', 'Moore', '9876543215', 'mary_m', 'FEMALE', '2001-06-18', '17 Rose Ave, Pune', 'mary@123', 'mary@example.com', 'ACTIVE', 0, '2025-07-07 08:20:00'),
+('HID007', 'Monica', 'Taylor', '9876543216', 'monica_t', 'FEMALE', '2007-07-30', '33 Sunrise Blvd, Jaipur', 'monica@123', 'monica@example.com', 'ACTIVE', 0, '2025-07-08 13:40:00'),
+('HID008', 'Susan', 'Anderson', '9876543217', 'susan_a', 'FEMALE', '2009-08-12', '59 West End, Lucknow', 'susan@123', 'susan@example.com', 'ACTIVE', 0, '2025-07-09 10:50:00'),
+('HID009', 'Srijan', 'Kumar', '9876543218', 'srijan_k', 'MALE', '2012-09-05', '88 Tech Park, Noida', 'srijan@123', 'srijan@example.com', 'ACTIVE', 0, '2025-07-10 09:15:00'),
+('HID010', 'Manoj', 'Verma', '9876543219', 'manoj_v', 'MALE', '2024-10-10', '101 Green Field, Bhopal', 'manoj@123', 'manoj@example.com', 'ACTIVE', 0, '2025-07-11 11:30:00'),
+('HID011', 'Priya', 'Patel', '9876543220', 'priya_p', 'FEMALE', '2020-11-20', '44 Royal Enclave, Surat', 'priya@123', 'priya@example.com', 'ACTIVE', 0, '2025-07-12 14:20:00'),
+('HID012', 'Arjun', 'Sharma', '9876543221', 'arjun_s', 'MALE', '2008-12-25', '3 Garden City, Ranchi', 'arjun@123', 'arjun@example.com', 'INACTIVE', 1, '2025-07-13 16:45:00'),
+('HID013', 'Neha', 'Desai', '9876543222', 'neha_d', 'FEMALE', '2015-01-15', '9 Skyline Tower, Nagpur', 'neha@123', 'neha@example.com', 'BLOCKED', 3, '2025-07-14 10:10:00'),
+('HID014', 'Karan', 'Singh', '9876543223', 'karan_s', 'MALE', '1994-03-10', '77 Vasant Vihar, Delhi', 'karan@123', 'karan@example.com', 'ACTIVE', 0, '2025-07-15 08:30:00'),
+('HID015', 'Divya', 'Joshi', '9876543224', 'divya_j', 'FEMALE', '1993-04-22', '14 Ganga Nagar, Varanasi', 'divya@123', 'divya@example.com', 'ACTIVE', 0, '2025-07-16 12:40:00'),
+('HID016', 'John', 'Doe', '9876543225', 'john_doe', 'MALE', '1990-01-01', '123 Grace Rd, Goa', 'john@123', 'john@example.com', 'ACTIVE', 0, '2025-07-17 09:25:00'),
+('HID017', 'Emily', 'White', '9876543226', 'emily_w', 'FEMALE', '1992-03-14', '456 Peace St, Chennai', 'emily@123', 'emily@example.com', 'ACTIVE', 0, '2025-07-18 14:15:00'),
+('HID018', 'Peter', 'Smith', '9876543227', 'peter_s', 'MALE', '1985-06-21', '789 Hope Ave, Bengaluru', 'peter@123', 'peter@example.com', 'ACTIVE', 0, '2025-07-19 11:30:00'),
+('HID019', 'Rachel', 'Green', '9876543228', 'rachel_g', 'FEMALE', '1993-08-10', '101 Cross Lane, Mumbai', 'rachel@123', 'rachel@example.com', 'INACTIVE', 1, '2025-07-20 16:20:00'),
+('HID020', 'Paul', 'Brown', '9876543229', 'paul_b', 'MALE', '1989-07-17', '202 Palm Rd, Pune', 'paul@123', 'paul@example.com', 'BLOCKED', 3, '2025-07-21 10:40:00'),
+('HID021', 'Anna', 'Thomas', '9876543230', 'anna_t', 'FEMALE', '1994-09-05', '303 Riverbank, Kochi', 'anna@123', 'anna@example.com', 'ACTIVE', 0, '2025-07-22 13:50:00'),
+('HID022', 'David', 'Taylor', '9876543231', 'david_t', 'MALE', '1988-10-12', '404 Harmony St, Trivandrum', 'david@123', 'david@example.com', 'ACTIVE', 0, '2025-07-23 08:15:00'),
+('HID023', 'Grace', 'Lee', '9876543232', 'grace_l', 'FEMALE', '1990-05-20', '505 Faith Circle, Bhopal', 'grace@123', 'grace@example.com', 'ACTIVE', 0, '2025-07-24 12:30:00'),
+('HID024', 'Matthew', 'Jones', '9876543233', 'matthew_j', 'MALE', '1995-01-23', '606 Lake Side, Surat', 'matthew@123', 'matthew@example.com', 'INACTIVE', 2, '2025-07-25 15:40:00'),
+('HID025', 'Sophie', 'Martin', '9876543234', 'sophie_m', 'FEMALE', '1996-02-28', '707 Church Rd, Nagpur', 'sophie@123', 'sophie@example.com', 'ACTIVE', 0, '2025-07-26 09:20:00'),
+('HID026', 'Luke', 'Evans', '9876543235', 'luke_e', 'MALE', '1987-11-11', '808 Sunrise Ave, Indore', 'luke@123', 'luke@example.com', 'ACTIVE', 0, '2025-07-27 14:10:00'),
+('HID027', 'Chloe', 'Scott', '9876543236', 'chloe_s', 'FEMALE', '1999-12-15', '909 Spring St, Jaipur', 'chloe@123', 'chloe@example.com', 'BLOCKED', 3, '2025-07-28 10:30:00'),
+('HID028', 'Andrew', 'Cooper', '9876543237', 'andrew_c', 'MALE', '1991-04-19', '1010 Maple Dr, Varanasi', 'andrew@123', 'andrew@example.com', 'ACTIVE', 0, '2025-07-29 16:45:00'),
+('HID029', 'Isabella', 'Morris', '9876543238', 'isabella_m', 'FEMALE', '2000-06-30', '1111 Beacon Rd, Patna', 'isabella@123', 'isabella@example.com', 'ACTIVE', 0, '2025-07-30 11:15:00'),
+('HID030', 'Daniel', 'Reed', '9876543239', 'daniel_r', 'MALE', '1992-07-01', '1212 Emerald Ln, Lucknow', 'daniel@123', 'daniel@example.com', 'ACTIVE', 0, '2025-07-31 13:20:00'),
+('HID031', 'Lily', 'Turner', '9876543240', 'lily_t', 'FEMALE', '1986-09-17', '1313 Garden Rd, Amritsar', 'lily@123', 'lily@example.com', 'ACTIVE', 0, '2025-08-01 09:40:00'),
+('HID032', 'Joseph', 'Bailey', '9876543241', 'joseph_b', 'MALE', '1993-03-03', '1414 Hilltop Rd, Ranchi', 'joseph@123', 'joseph@example.com', 'INACTIVE', 1, '2025-08-02 14:50:00'),
+('HID033', 'Natalie', 'Walker', '9876543242', 'natalie_w', 'FEMALE', '1994-04-25', '1515 St. Marys St, Mysore', 'natalie@123', 'natalie@example.com', 'ACTIVE', 0, '2025-08-03 10:10:00'),
+('HID034', 'Samuel', 'Roberts', '9876543243', 'samuel_r', 'MALE', '1996-08-18', '1616 Peace Colony, Raipur', 'samuel@123', 'samuel@example.com', 'BLOCKED', 3, '2025-08-04 15:30:00'),
+('HID035', 'Abigail', 'King', '9876543244', 'abigail_k', 'FEMALE', '1991-11-30', '1717 Blossom St, Kanpur', 'abigail@123', 'abigail@example.com', 'ACTIVE', 0, '2025-08-05 11:45:00'),
+('HID036', 'Mark', 'Wright', '9876543245', 'mark_w', 'MALE', '1989-12-24', '1818 Victory Rd, Agra', 'mark@123', 'mark@example.com', 'ACTIVE', 0, '2025-08-06 08:20:00'),
+('HID037', 'Olivia', 'Hill', '9876543246', 'olivia_h', 'FEMALE', '1997-05-06', '1919 Zion St, Coimbatore', 'olivia@123', 'olivia@example.com', 'ACTIVE', 0, '2025-08-07 12:30:00'),
+('HID038', 'Thomas', 'Baker', '9876543247', 'tom_b', 'MALE', '1988-06-16', '2020 Cathedral St, Gwalior', 'tom@123', 'tom@example.com', 'ACTIVE', 0, '2025-08-08 16:40:00'),
+('HID039', 'Hannah', 'Nelson', '9876543248', 'hannah_n', 'FEMALE', '1995-07-19', '2121 Light House Rd, Shimla', 'hannah@123', 'hannah@example.com', 'INACTIVE', 1, '2025-08-09 09:15:00'),
+('HID040', 'Joshua', 'Carter', '9876543249', 'joshua_c', 'MALE', '1992-09-09', '2222 Elm St, Guwahati', 'joshua@123', 'joshua@example.com', 'ACTIVE', 0, '2025-08-10 13:25:00'),
+('HID041', 'Mia', 'Russell', '9876543250', 'mia_r', 'FEMALE', '1994-02-14', '2323 New Hope St, Jammu', 'mia@123', 'mia@example.com', 'BLOCKED', 3, '2025-08-11 10:35:00'),
+('HID042', 'Ethan', 'Howard', '9876543251', 'ethan_h', 'MALE', '1990-04-12', '2424 Blessing Rd, Siliguri', 'ethan@123', 'ethan@example.com', 'ACTIVE', 0, '2025-08-12 14:45:00'),
+('HID043', 'Charlotte', 'Ward', '9876543252', 'charlotte_w', 'FEMALE', '1996-11-11', '2525 Christ Rd, Jamshedpur', 'charlotte@123', 'charlotte@example.com', 'ACTIVE', 0, '2025-08-13 08:10:00'),
+('HID044', 'Logan', 'Bell', '9876543253', 'logan_b', 'MALE', '1991-12-01', '2626 Trinity St, Nashik', 'logan@123', 'logan@example.com', 'ACTIVE', 0, '2025-08-14 12:20:00'),
+('HID045', 'Zoe', 'Griffin', '9876543254', 'zoe_g', 'FEMALE', '1993-01-18', '2727 Gospel Ave, Dhanbad', 'zoe@123', 'zoe@example.com', 'ACTIVE', 0, '2025-08-15 16:30:00'),
+('HID046', 'Benjamin', 'Ward', '9876543255', 'benjamin_w', 'MALE', '1987-08-22', '2828 Mount Olive Rd, Panaji', 'benjamin@123', 'benjamin@example.com', 'ACTIVE', 0, '2025-08-16 09:40:00'),
+('HID047', 'Lucy', 'Price', '9876543256', 'lucy_p', 'FEMALE', '1995-03-05', '2929 Zion Hill Rd, Itanagar', 'lucy@123', 'lucy@example.com', 'INACTIVE', 2, '2025-08-17 13:50:00'),
+('HID048', 'Aaron', 'Wells', '9876543257', 'aaron_w', 'MALE', '1986-06-11', '3030 Bethlehem St, Aizawl', 'aaron@123', 'aaron@example.com', 'ACTIVE', 0, '2025-08-18 10:05:00'),
+('HID049', 'Ella', 'Newton', '9876543258', 'ella_n', 'FEMALE', '1997-10-29', '3131 Church View, Shillong', 'ella@123', 'ella@example.com', 'ACTIVE', 0, '2025-08-19 14:15:00'),
+('HID050', 'Henry', 'Grant', '9876543259', 'henry_g', 'MALE', '1992-12-05', '3232 Emmanuel Rd, Imphal', 'henry@123', 'henry@example.com', 'ACTIVE', 0, '2025-08-20 08:25:00'),
+('HID051', 'Madeline', 'Stewart', '9876543260', 'madeline_s', 'FEMALE', '1994-07-13', '3333 Mission Ln, Thiruvananthapuram', 'madeline@123', 'madeline@example.com', 'BLOCKED', 3, '2025-08-21 12:35:00'),
+('HID052', 'Noah', 'Perry', '9876543261', 'noah_p', 'MALE', '1993-03-25', '3434 Heaven St, Puducherry', 'noah@123', 'noah@example.com', 'ACTIVE', 0, '2025-08-22 16:45:00'),
+('HID053', 'Clara', 'Lawson', '9876543262', 'clara_l', 'FEMALE', '1990-08-16', '3535 Saint Paul Rd, Bhilai', 'clara@123', 'clara@example.com', 'ACTIVE', 0, '2025-08-23 09:55:00'),
+('HID054', 'Owen', 'Bishop', '9876543263', 'owen_b', 'MALE', '1989-09-07', '3636 Churchyard Ln, Bareilly', 'owen@123', 'owen@example.com', 'ACTIVE', 0, '2025-08-24 14:05:00'),
+('HID055', 'Eva', 'Rhodes', '9876543264', 'eva_r', 'FEMALE', '1996-05-27', '3737 Cross Way, Mangalore', 'eva@123', 'eva@example.com', 'ACTIVE', 0, '2025-08-25 10:15:00'),
+('HID056', 'Nathan', 'Burns', '9876543265', 'nathan_b', 'MALE', '1988-02-20', '3838 Bible Hill Rd, Jhansi', 'nathan@123', 'nathan@example.com', 'INACTIVE', 2, '2025-08-26 14:25:00'),
+('HID057', 'Naomi', 'Rogers', '9876543266', 'naomi_r', 'FEMALE', '1991-06-04', '3939 Savior St, Tiruchirappalli', 'naomi@123', 'naomi@example.com', 'ACTIVE', 0, '2025-08-27 08:35:00'),
+('HID058', 'Caleb', 'Foster', '9876543267', 'caleb_f', 'MALE', '1990-01-30', '4040 Chapel Hill, Dehradun', 'caleb@123', 'caleb@example.com', 'ACTIVE', 0, '2025-08-28 12:45:00'),
+('HID059', 'Faith', 'Hart', '9876543268', 'faith_h', 'FEMALE', '1993-10-03', '4141 Calvary Rd, Udaipur', 'faith@123', 'faith@example.com', 'BLOCKED', 3, '2025-08-29 16:55:00'),
+('HID060', 'Eli', 'Kelley', '9876543269', 'eli_k', 'MALE', '1992-11-29', '4242 Sacred Heart Ln, Aligarh', 'eli@123', 'eli@example.com', 'ACTIVE', 0, '2025-08-30 10:05:00'),
+('HID061', 'Stella', 'Pierce', '9876543270', 'stella_p', 'FEMALE', '1994-12-19', '4343 Blessed Way, Guntur', 'stella@123', 'stella@example.com', 'ACTIVE', 0, '2025-08-31 14:15:00'),
+('HID062', 'Asher', 'Ray', '9876543271', 'asher_r', 'MALE', '1986-03-17', '4444 Saint Thomas Rd, Saharanpur', 'asher@123', 'asher@example.com', 'ACTIVE', 0, '2025-09-01 08:25:00'),
+('HID063', 'Eden', 'Bennett', '9876543272', 'eden_b', 'FEMALE', '1989-04-08', '4545 Divine Hill, Nellore', 'eden@123', 'eden@example.com', 'ACTIVE', 0, '2025-09-02 12:35:00'),
+('HID064', 'Levi', 'Pope', '9876543273', 'levi_p', 'MALE', '1991-01-11', '4646 Trinity Way, Ajmer', 'levi@123', 'levi@example.com', 'INACTIVE', 1, '2025-09-03 16:45:00'),
+('HID065', 'Hope', 'Spencer', '9876543274', 'hope_s', 'FEMALE', '1995-06-26', '4747 Gospel Hill, Durgapur', 'hope@123', 'hope@example.com', 'ACTIVE', 0, '2025-09-04 10:55:00');
+-- ===========================
+-- 3. Appointment
+-- ===========================
+
+-- To Send
+CREATE TABLE Appointment (
+    appointment_id VARCHAR(36) PRIMARY KEY,
+    doctor_id VARCHAR(36) NOT NULL,
+    h_id VARCHAR(36) NOT NULL,
+    availability_id VARCHAR(36) NOT NULL,
+    provider_id VARCHAR(36) NOT NULL,
+    requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    booked_at TIMESTAMP NULL,
+    cancelled_at TIMESTAMP NULL,
+	completed_at TIMESTAMP NULL,
+    status ENUM('PENDING', 'BOOKED', 'CANCELLED', 'COMPLETED') DEFAULT 'PENDING',
+    slot_no INT NOT NULL,
+  start TIMESTAMP,
+  end TIMESTAMP,
+    notes TEXT,
+    FOREIGN KEY (doctor_id) REFERENCES Doctors(doctor_id),
+    FOREIGN KEY (h_id) REFERENCES Recipient(h_id),
+    FOREIGN KEY (availability_id) REFERENCES Doctor_availability(availability_id),
+    FOREIGN KEY (provider_id) REFERENCES Providers(provider_id)
+);
+
+-- ===========================
+-- 4. Procedure & Prescription
+-- ===========================
+
+-- To Send
+
+CREATE TABLE medical_procedure (
+    procedure_id VARCHAR(20) PRIMARY KEY,
+    appointment_id VARCHAR(20) NOT NULL,
+    h_id VARCHAR(20) NOT NULL,
+    provider_id VARCHAR(20) NOT NULL,
+    doctor_id VARCHAR(20) NOT NULL,
+    scheduled_date DATE,                           -- NEW: for scheduled/planned procedures
+    procedure_date DATE,                           -- Actual date of procedure (if single-day)
+    from_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Start of long-term procedure
+    to_date TIMESTAMP,                             -- End of long-term procedure
+    diagnosis TEXT NOT NULL,
+    recommendations TEXT,
+    procedure_type ENUM('SINGLE_DAY','LONG_TERM'),
+    procedure_status ENUM('IN_PROGRESS', 'COMPLETED'),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (appointment_id) REFERENCES Appointment(appointment_id),
+    FOREIGN KEY (h_id) REFERENCES Recipient(h_id),
+    FOREIGN KEY (provider_id) REFERENCES Providers(provider_id),
+    FOREIGN KEY (doctor_id) REFERENCES Doctors(doctor_id)
+);
+
+-- To Send
+
+CREATE TABLE prescription (
+    prescription_id VARCHAR(20) PRIMARY KEY,
+    procedure_id VARCHAR(20) NOT NULL,
+    h_id VARCHAR(20) NOT NULL,
+    provider_id VARCHAR(20) NOT NULL,
+    doctor_id VARCHAR(20) NOT NULL,
+    prescribed_by VARCHAR(20) NOT NULL,
+    written_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    start_date TIMESTAMP,
+    end_date TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    notes TEXT,
+    FOREIGN KEY (procedure_id) REFERENCES medical_procedure(procedure_id),
+    FOREIGN KEY (h_id) REFERENCES Recipient(h_id),
+    FOREIGN KEY (provider_id) REFERENCES Providers(provider_id),
+    FOREIGN KEY (doctor_id) REFERENCES Doctors(doctor_id),
+    foreign key(prescribed_by) REFERENCES Doctors(doctor_id)
+);
+
+-- To Send
+
+CREATE TABLE prescribed_medicines (
+    prescribed_id VARCHAR(20) PRIMARY KEY,
+    prescription_id VARCHAR(20) NOT NULL,
+    medicine_name VARCHAR(255) NOT NULL,
+	medicine_type ENUM('tablet', 'syrup','injection', 'drop') NOT NULL,
+    dosage VARCHAR(100),
+    duration VARCHAR(100),
+    notes TEXT,
+     start_date TIMESTAMP,
+    end_date TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (prescription_id) REFERENCES prescription(prescription_id)
+);
+
+-- To Send
+
+CREATE TABLE prescribed_tests (
+    test_id VARCHAR(20) PRIMARY KEY,
+    prescription_id VARCHAR(20) NOT NULL,
+    test_name VARCHAR(100) NOT NULL,
+    test_date DATE NOT NULL,
+    result_summary TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (prescription_id) REFERENCES prescription(prescription_id)
+);
+
+-- To Send
+
+CREATE TABLE procedure_daily_log (
+    log_id VARCHAR(20) PRIMARY KEY,
+    procedure_id VARCHAR(20) NOT NULL,
+    logged_by VARCHAR(20),
+    log_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    vitals TEXT,  -- optional (BP, temp, pulse)
+    notes TEXT,   -- e.g., "Patient stable", "No new meds today"
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (procedure_id) REFERENCES medical_procedure(procedure_id)
+);
+
+-- Ravikant Table
+
+CREATE TABLE insurance_company (
+    company_id VARCHAR(255) NOT NULL,
+    name VARCHAR(255),
+    logo_url VARCHAR(255),
+    head_office VARCHAR(255),
+    contact_email VARCHAR(255),
+    contact_phone VARCHAR(255),
+    PRIMARY KEY (company_id)
+);
+ 
+ 
+CREATE TABLE insurance_plan (
+    plan_id VARCHAR(255) NOT NULL PRIMARY KEY,
+    company_id VARCHAR(255) NOT NULL,
+    plan_name VARCHAR(255),
+    plan_type VARCHAR(255),
+    min_entry_age INT,
+    max_entry_age INT,
+    description TEXT,
+    available_cover_amounts DOUBLE,
+    waiting_period INT,
+    created_on DATE,
+    expire_date DATE,
+    active_on DATE,
+    periodic_diseases VARCHAR(255),
+    maximum_member_allowed INT,
+    minimum_member_allowed INT
+);
+ 
+ 
+CREATE TABLE insurance_coverage_option (
+    coverage_id VARCHAR(255) NOT NULL PRIMARY KEY,
+    plan_id VARCHAR(255),
+    premium_amount DOUBLE,
+    coverage_amount DOUBLE,
+    status VARCHAR(20) NOT NULL,
+    coverage_type VARCHAR(20) NOT NULL
+);
+ 
+ 
+CREATE TABLE member_plan_rule (
+    member_id VARCHAR(50) NOT NULL PRIMARY KEY,
+    gender ENUM('MALE', 'FEMALE'),
+    relation VARCHAR(100),
+    plan_id VARCHAR(50)
+);
+
+-- To send
+CREATE TABLE subscribe (
+    subscribe_id VARCHAR(50) PRIMARY KEY,
+    h_id VARCHAR(50),
+    coverage_id VARCHAR(50),
+    subscribe_date DATE NOT NULL,
+    start_date DATE NOT NULL,
+    expiry_date DATE NOT NULL,
+    type enum('INDIVIDUAL','FAMILY'),
+    status ENUM('ACTIVE', 'EXPIRED') NOT NULL,
+    remaining_coverage_amount NUMERIC(9,2),
+    total_premium DECIMAL(10, 2) NOT NULL,
+    amount_paid DECIMAL(10, 2) DEFAULT 0.00,
+    FOREIGN KEY (h_id) REFERENCES Recipient(h_id),
+    FOREIGN KEY (coverage_id) REFERENCES Insurance_coverage_option(coverage_id)
+);
+
+-- To send
+
+CREATE TABLE subscribed_members (
+    member_id VARCHAR(50) PRIMARY KEY,
+    subscribe_id VARCHAR(50),
+     h_id VARCHAR(50),
+    full_name VARCHAR(100) NOT NULL,
+    age INT,
+    gender VARCHAR(10),
+    relation_with_proposer VARCHAR(30), -- Self, Spouse, Child, Parent
+    aadhar_no VARCHAR(20),
+	FOREIGN KEY (h_id) REFERENCES Recipient(h_id),
+    FOREIGN KEY (subscribe_id) REFERENCES subscribe(subscribe_id)
+);
+
+-- ===========================
+-- 7. Claims
+-- ===========================
+
+-- To send
+
+CREATE TABLE Claims (
+    claim_id VARCHAR(20) PRIMARY KEY,
+    subscribe_id VARCHAR(20) NOT NULL,
+    procedure_id VARCHAR(20) NOT NULL,
+    provider_id VARCHAR(20) NOT NULL,
+    h_id VARCHAR(20) NOT NULL,
+    claim_status ENUM('PENDING', 'APPROVED', 'DENIED') DEFAULT 'PENDING',
+    claim_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    amount_claimed DECIMAL(10, 2) NOT NULL,
+    amount_approved DECIMAL(10, 2) DEFAULT 0.00,
+    FOREIGN KEY (procedure_id) REFERENCES medical_procedure(procedure_id),
+    FOREIGN KEY (provider_id) REFERENCES Providers(provider_id),
+    FOREIGN KEY (h_id) REFERENCES Recipient(h_id),
+    FOREIGN KEY (subscribe_id) REFERENCES subscribe(subscribe_id)
+);
+
+-- To send
+
+CREATE TABLE Claim_history (
+    claim_history_id VARCHAR(20) PRIMARY KEY,
+    claim_id VARCHAR(20),
+    description VARCHAR(255),
+    action_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (claim_id) REFERENCES Claims(claim_id)
+);
+
+-- ===========================
+-- 8. Payment History
+-- ===========================
+
+-- To send
+
+CREATE TABLE Payment_history (
+    payment_id VARCHAR(20) PRIMARY KEY,
+    h_id VARCHAR(20) NOT NULL,
+    provider_id VARCHAR(20) NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    payment_method VARCHAR(50),
+    payment_status ENUM('pending', 'completed', 'failed') DEFAULT 'pending',
+    payment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    remarks TEXT,
+    FOREIGN KEY (h_id) REFERENCES Recipient(h_id),
+    FOREIGN KEY (provider_id) REFERENCES Providers(provider_id)
+);
+
+CREATE TABLE Pharmacy (
+    pharmacy_id VARCHAR(10) PRIMARY KEY,
+    pharmacy_name VARCHAR(100) NOT NULL,
+    contact_no VARCHAR(15) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    password VARCHAR(45)  NULL,
+    created_at TIMESTAMP NOT NULL,
+    state VARCHAR(50) NOT NULL,
+    city VARCHAR(100) NOT NULL,
+    license_no VARCHAR(20) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    gst_no VARCHAR(20),
+    pin_code VARCHAR(10),
+    address_line1 VARCHAR(255),
+    first_name VARCHAR(100),
+    middle_name VARCHAR(100),
+    last_name VARCHAR(100),
+    gender VARCHAR(10),
+    owner_mobile VARCHAR(20),
+    owner_email VARCHAR(100),
+    aadhar VARCHAR(20),
+    owner_address VARCHAR(255)
+);
+ 
+INSERT INTO Pharmacy VALUES 
+('PH001', 'HealthPlus Pharmacy', '9876543210', 'info@healthplus.com', 'securePass01', CURRENT_TIMESTAMP, 'Karnataka', 'Bengaluru', 'LIC12345', 'Active', 'GSTIN1234KP', '560001', '12 MG Road', 'Raj', NULL, 'Kumar', 'Male', '9876543211', 'raj.kumar@healthplus.com', 'AADHAR123456', '45 Residency Road'),
+('PH002', 'MedCare Hub', '9123456780', 'support@medcarehub.in', 'safeKey88', CURRENT_TIMESTAMP, 'Maharashtra', 'Mumbai', 'LIC67890', 'Active', 'GSTIN5678MH', '400001', '101 Linking Road', 'Priya', 'Anita', 'Desai', 'Female', '9123456781', 'priya.desai@medcarehub.in', 'AADHAR654321', '3rd Floor, Kurla Complex'),
+('PH003', 'WellSpring Drugs', '9988776655', 'contact@wellspring.com', 'medsecure99', CURRENT_TIMESTAMP, 'Delhi', 'New Delhi', 'LIC54321', 'Inactive', 'GSTIN9876DL', '110001', '50 Connaught Place', 'Arun', NULL, 'Joshi', 'Male', '9988776656', 'arun.joshi@wellspring.com', 'AADHAR789012', 'Sector 8, Dwarka'),
+('PH004', 'CareFirst Meds', '9012345678', 'hello@carefirst.org', 'passWord77', CURRENT_TIMESTAMP, 'Tamil Nadu', 'Chennai', 'LIC76543', 'Active', 'GSTIN3210TN', '600002', '23 Cathedral Road', 'Meena', 'Lakshmi', 'Ravi', 'Female', '9012345679', 'meena.ravi@carefirst.org', 'AADHAR345678', 'Bungalow No.4, Nungambakkam'),
+('PH005', 'Trust Pharmacy', '9823456789', 'trust@pharmacy.net', 'trusTPwd33', CURRENT_TIMESTAMP, 'West Bengal', 'Kolkata', 'LIC11223', 'Inactive', 'GSTIN1234WB', '700001', '88 Park Street', 'Vikram', NULL, 'Sen', 'Male', '9823456790', 'vikram.sen@trustpharmacy.net', 'AADHAR901234', 'Flat 10, Ballygunge Place');
+ 
+ CREATE TABLE passwords (
+  PASSWORD_ID INT NOT NULL AUTO_INCREMENT,
+  PHARMACY_ID VARCHAR(45) NOT NULL,
+  PASSWORD VARCHAR(255) DEFAULT NULL,
+  PRIMARY KEY (PASSWORD_ID),
+  INDEX (PHARMACY_ID),
+  FOREIGN KEY (PHARMACY_ID) REFERENCES pharmacy(pharmacy_id)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+);
+ 
+INSERT INTO passwords (PHARMACY_ID, PASSWORD) VALUES ('PH001', 'Ananta@123');
+INSERT INTO passwords (PHARMACY_ID, PASSWORD) VALUES ('PH001', 'Anu@1');
+INSERT INTO passwords (PHARMACY_ID, PASSWORD) VALUES ('PH001', 'medic789');
+INSERT INTO passwords (PHARMACY_ID, PASSWORD) VALUES ('PH001', 'health@2025');
+INSERT INTO passwords (PHARMACY_ID, PASSWORD) VALUES ('PH002', 'pharma#pass');
+ 
+ CREATE TABLE Medicines (
+    medicine_id VARCHAR(10) PRIMARY KEY,
+    medicine_name VARCHAR(100) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    quantity_in_stock INT NOT NULL,
+    expiry_date DATE NOT NULL,
+    unit_price DOUBLE NOT NULL,
+    pharmacy_id VARCHAR(10) NOT NULL,
+    purpose VARCHAR(100) NOT NULL,
+    batch_no VARCHAR(20) NOT NULL,
+    FOREIGN KEY (pharmacy_id) REFERENCES Pharmacy(pharmacy_id)
+);
+ 
+INSERT INTO Medicines VALUES 
+('MD001', 'Paracetamol 500mg', 'Pain relief and fever reducer', 200, '2026-05-10', 1.50, 'PH001', 'Pain relief', 'BATCHP001'),
+('MD002', 'Amoxicillin 250mg', 'Antibiotic for bacterial infections', 150, '2026-03-20', 4.75, 'PH001', 'Infection control', 'BATCHA002'),
+('MD003', 'Cetirizine 10mg', 'Antihistamine for allergies', 180, '2025-12-01', 2.00, 'PH002', 'Allergy relief', 'BATCHC003'),
+('MD004', 'Metformin 500mg', 'Used for Type 2 Diabetes', 100, '2026-07-15', 3.20, 'PH002', 'Diabetes management', 'BATCHM004'),
+('MD005', 'Ibuprofen 400mg', 'Anti-inflammatory and painkiller', 250, '2026-01-30', 2.50, 'PH003', 'Inflammation/pain', 'BATCHI005'),
+('MD006', 'Omeprazole 20mg', 'Treatment for acid reflux', 220, '2025-11-05', 1.95, 'PH003', 'Gastric issues', 'BATCHO006'),
+('MD007', 'Azithromycin 500mg', 'Broad-spectrum antibiotic', 130, '2026-06-25', 5.30, 'PH004', 'Infection control', 'BATCHA007'),
+('MD008', 'Losartan 50mg', 'Used to treat high blood pressure', 90, '2026-08-10', 3.90, 'PH004', 'Hypertension', 'BATCHL008'),
+('MD009', 'Levocetirizine 5mg', 'Antihistamine for allergic conditions', 160, '2025-10-18', 2.20, 'PH005', 'Allergy relief', 'BATCHL009'),
+('MD010', 'Aspirin 81mg', 'Blood thinner and pain reliever', 300, '2026-04-02', 1.25, 'PH005', 'Cardiac care & pain', 'BATCHA010');
+
+ 
+
+CREATE TABLE Pharmacists (
+    pharmacist_id VARCHAR(10) PRIMARY KEY,
+    pharmacist_name VARCHAR(100) NOT NULL,
+    phone_no VARCHAR(15) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    pharmacy_id VARCHAR(10) NOT NULL,
+    FOREIGN KEY (pharmacy_id) REFERENCES Pharmacy(pharmacy_id)
+);
+ 
+INSERT INTO Pharmacists VALUES 
+('PR001', 'Sneha Nair', '9876001234', 'sneha.nair@healthplus.com', 'PH001'),
+('PR002', 'Rohit Sharma', '9123456789', 'rohit.sharma@medcarehub.in', 'PH002'),
+('PR003', 'Anita Dutta', '9988776655', 'anita.dutta@wellspring.com', 'PH003'),
+('PR004', 'Karthik Iyer', '9012345670', 'karthik.iyer@carefirst.org', 'PH004'),
+('PR005', 'Meera Sen', '9823456781', 'meera.sen@trustpharmacy.net', 'PH005');
+ 
+
+CREATE TABLE Dispensed_Medicines (
+    dispense_id VARCHAR(10) PRIMARY KEY,
+    medicine_id VARCHAR(10) NOT NULL,
+    quantity_dispensed INT NOT NULL,
+    dispense_date DATE NOT NULL,
+    prescription_id varchar(10) Not Null,
+    doctor_id VARCHAR(10) NOT NULL,
+    h_id VARCHAR(10) NOT NULL,
+    pharmacist_name VARCHAR(45) NOT NULL,
+    pharmacy_id VARCHAR(10) NOT NULL,
+    FOREIGN KEY (Pharmacy_Id) REFERENCES Pharmacy(Pharmacy_Id),
+    FOREIGN KEY (medicine_id) REFERENCES medicines(medicine_id)
+    );
+ 
+INSERT INTO Dispensed_Medicines VALUES 
+('DP001', 'MD001', 10, '2025-07-01', 'RX001', 'DR001', 'H001', 'Sneha Nair', 'PH001'),
+('DP002', 'MD003', 5, '2025-07-02', 'RX002', 'DR002', 'H002', 'Rohit Sharma', 'PH002'),
+('DP003', 'MD005', 8, '2025-07-02', 'RX003', 'DR003', 'H003', 'Anita Dutta', 'PH003'),
+('DP004', 'MD007', 12, '2025-07-03', 'RX004', 'DR004', 'H004', 'Karthik Iyer', 'PH004'),
+('DP005', 'MD009', 6, '2025-07-03', 'RX005', 'DR005', 'H005', 'Meera Sen', 'PH005');
+ 
+
+CREATE TABLE Equipment (
+    equipment_id VARCHAR(10) PRIMARY KEY,
+    equipment_name VARCHAR(100) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    quantity INT NOT NULL,
+    unit_price DOUBLE NOT NULL,
+    purpose VARCHAR(100) NOT NULL,
+    purchase_date DATE NOT NULL,
+    pharmacy_id VARCHAR(10) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    FOREIGN KEY (pharmacy_id) REFERENCES Pharmacy(pharmacy_id)
+);
+ 
+INSERT INTO Equipment VALUES 
+('EQ001', 'Refrigerator', 'Used for storing temperature-sensitive medicines', 2, 15000.00, 'Medicine storage', '2025-06-10', 'PH001', 'Active'),
+('EQ002', 'Digital Thermometer', 'For measuring patient and medicine storage temperatures', 10, 250.00, 'Temperature check', '2025-06-12', 'PH001', 'Active'),
+('EQ003', 'Blood Pressure Monitor', 'Used to measure patients’ blood pressure', 5, 1200.00, 'Patient checkup', '2025-06-11', 'PH002', 'Active'),
+('EQ004', 'Weighing Scale', 'For measuring patient and medicine weights', 3, 800.00, 'Measurement', '2025-06-13', 'PH002', 'Active'),
+('EQ005', 'Label Printer', 'Prints prescription and medicine labels', 2, 4500.00, 'Labeling', '2025-06-10', 'PH003', 'Inactive'),
+('EQ006', 'Barcode Scanner', 'Scans medicine barcodes for inventory tracking', 4, 1800.00, 'Inventory management', '2025-06-14', 'PH003', 'Active'),
+('EQ007', 'Centrifuge', 'Used for medical testing and sample separation', 1, 8500.00, 'Sample analysis', '2025-06-15', 'PH004', 'Active'),
+('EQ008', 'Oxygen Cylinder', 'Emergency use for patients with respiratory issues', 6, 2200.00, 'Emergency response', '2025-06-10', 'PH004', 'Active'),
+('EQ009', 'UV Sterilizer', 'Sterilizes instruments using UV light', 2, 6500.00, 'Instrument sterilization', '2025-06-12', 'PH005', 'Inactive'),
+('EQ010', 'Pulse Oximeter', 'Monitors oxygen levels in patients’ blood', 7, 900.00, 'Patient monitoring', '2025-06-13', 'PH005', 'Active');
+ 
+ 
+
+CREATE TABLE Dispensed_Equipments (
+    dispensed_equip_id VARCHAR(10) PRIMARY KEY,
+    equipment_id VARCHAR(10) NOT NULL,
+    quantity_dispensed INT NOT NULL,
+    dispense_date DATE NOT NULL,
+    prescription_id varchar(10) Not Null,
+    doctor_id VARCHAR(10) NOT NULL,
+    h_id VARCHAR(10) NOT NULL,
+    pharmacist_name VARCHAR(45) NOT NULL,
+    pharmacy_id VARCHAR(10) NOT NULL,
+    FOREIGN KEY (Pharmacy_Id) REFERENCES Pharmacy(Pharmacy_Id),
+    FOREIGN KEY (equipment_id) REFERENCES equipment(equipment_id)
+    );
+    INSERT INTO Dispensed_Equipments VALUES 
+('DE001', 'EQ001', 1, '2025-07-01', 'RX001', 'DR001', 'H001', 'Sneha Nair', 'PH001'),
+('DE002', 'EQ003', 2, '2025-07-02', 'RX002', 'DR002', 'H002', 'Rohit Sharma', 'PH002'),
+('DE003', 'EQ006', 1, '2025-07-03', 'RX003', 'DR003', 'H003', 'Anita Dutta', 'PH003'),
+('DE004', 'EQ008', 3, '2025-07-04', 'RX004', 'DR004', 'H004', 'Karthik Iyer', 'PH004'),
+('DE005', 'EQ010', 2, '2025-07-05', 'RX005', 'DR005', 'H005', 'Meera Sen', 'PH005');
+ 
+ 
+
+CREATE TABLE Pharmacy_Otp (
+    otp_id INT AUTO_INCREMENT PRIMARY KEY,
+    pharmacy_id VARCHAR(20) NOT NULL,
+    otp_code VARCHAR(6) NOT NULL,
+    purpose ENUM('REGISTER', 'FORGOT_PASSWORD','OTP_LOGIN') NOT NULL,
+    new_password VARCHAR(255),
+    status ENUM('PENDING', 'VERIFIED', 'EXPIRED') NOT NULL DEFAULT 'PENDING',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at DATETIME NOT NULL,
+    FOREIGN KEY (pharmacy_id) REFERENCES Pharmacy(pharmacy_id)
+);
+ 
+INSERT INTO Admin_User (
+    user_id,
+     first_name,
+      last_name,
+     user_name,
+    password,
+     email,
+     created_at,
+   updated_at
+  ) VALUES (
+     1,
+   'Sourav Kumar',
+    'Das',
+ 'Sourav_24',
+   '22aec30bd5594209657a35420fa652a1',
+    'souravkumardas503@gmail.com',
+   '2025-08-14 10:31:26',
+     '2025-08-14 10:31:26'
+  );

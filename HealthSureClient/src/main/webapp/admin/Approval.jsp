@@ -16,7 +16,10 @@
 <head>
 <meta charset="UTF-8" />
 <title>Pharmacy Review Table</title>
-
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
+	integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ=="
+	crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" type="text/css"
 	href="${pageContext.request.contextPath}/resources/css/approvePharmacy.css" />
 
@@ -41,9 +44,16 @@
 				msgBox.style.display = 'none';
 			}
 			document.getElementById('loader').style.display = 'none';
-		}, 10000); // Hide loader and message after 10 seconds
+		}, 70000); // Hide loader and message after 10 seconds
 	};
 </Script>
+<style>
+.first-heading {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+</style>
 </head>
 <body>
 
@@ -72,7 +82,21 @@
 	<!-- Pharmacy Table -->
 	<div class="table-container">
 		<h:form>
-			<h2 style="text-align: center;">PHARMACY REVIEW AND APPROVAL</h2>
+
+			<div class="first-heading">
+				<div>
+					<h2 style="text-align: center;">PHARMACY REVIEW AND APPROVAL</h2>
+				</div>
+				<div>
+					<h:commandLink action="#{reviewPharmacyController.reset}" value=""
+						styleClass="icon-button " title="Reset">
+						<i class="fa-solid fa-arrows-rotate " style="color: black;"></i>
+					</h:commandLink>
+
+
+				</div>
+
+			</div>
 
 
 			<div class="table-container1">
@@ -313,6 +337,7 @@
 					</h:dataTable>
 
 					<!-- Row Next Button -->
+
 					<h:commandButton value="Next" title="Next row"
 						action="#{reviewPharmacyController.nextBlock}"
 						disabled="#{reviewPharmacyController.currentBlock + 1 ge (reviewPharmacyController.totalPages / reviewPharmacyController.pageBlockSize)}"
